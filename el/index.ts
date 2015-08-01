@@ -55,7 +55,7 @@ var generator = yeoman.generators.Base.extend({
   constructor: function () {
     yeoman.generators.Base.apply(this, arguments);
 
-    console.log( "constructor!");
+    //console.log( "constructor!");
     ((yo:generator.IElement) => {
     
       yo.existsElementsFile  = () => {
@@ -68,7 +68,7 @@ var generator = yeoman.generators.Base.extend({
     
   },
   initializing: function() {
-    console.log( "initializing!");
+    //console.log( "initializing!");
 
     ((yo:generator.IElement) => {
 
@@ -82,7 +82,7 @@ var generator = yeoman.generators.Base.extend({
   },
   prompting: function () {
 
-    console.log( "prompting!" );
+    //console.log( "prompting!" );
 
     ((yo:generator.IElement) => {
 
@@ -108,7 +108,7 @@ var generator = yeoman.generators.Base.extend({
 
   },
   configuring: function() {
-    console.log( "configuring!" );
+    //console.log( "configuring!" );
 
     ((yo:generator.IElement) => {
 
@@ -124,7 +124,7 @@ var generator = yeoman.generators.Base.extend({
 
   },
   element : function() {
-      console.log( "element writing!");
+      //console.log( "element writing!");
 
       ((yo:generator.IElement) => {
         
@@ -179,7 +179,7 @@ var generator = yeoman.generators.Base.extend({
 
   },
   end:function() {
-    console.log( "end" );
+    //console.log( "end" );
 
     ((yo:generator.IElement) => {
 
