@@ -1,0 +1,27 @@
+{
+  "version": "v4",
+  "repo": "borisyankov/DefinitelyTyped",
+  "ref": "master",
+  "path": "typings",
+  "bundle": "typings/tsd.d.ts",
+  "installed": {
+    "yeoman-generator/yeoman-generator.d.ts": {
+      "commit": "77ec1408257c677f8fd8d6798ebaf6bd87c11b9d"
+    },
+    "node/node.d.ts": {
+      "commit": "77ec1408257c677f8fd8d6798ebaf6bd87c11b9d"
+    },
+    "underscore.string/underscore.string.d.ts": {
+      "commit": "77ec1408257c677f8fd8d6798ebaf6bd87c11b9d"
+    },
+    "underscore/underscore.d.ts": {
+      "commit": "77ec1408257c677f8fd8d6798ebaf6bd87c11b9d"
+    },
+    "lodash/lodash.d.ts": {
+      "commit": "77ec1408257c677f8fd8d6798ebaf6bd87c11b9d"
+    },
+    "cheerio/cheerio.d.ts": {
+      "commit": "4df20c9706ce6ca27137617770b57f3a0d3f9689"
+    }
+  }
+}
