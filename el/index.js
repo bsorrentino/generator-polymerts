@@ -8,7 +8,7 @@ var yeoman = require("yeoman-generator");
 var generator = yeoman.generators.Base.extend({
     constructor: function () {
         yeoman.generators.Base.apply(this, arguments);
-        console.log("constructor!");
+        //console.log( "constructor!");
         (function (yo) {
             yo.existsElementsFile = function () {
                 return yo.fs.exists('app/elements/elements.html');
@@ -17,14 +17,14 @@ var generator = yeoman.generators.Base.extend({
         })(this);
     },
     initializing: function () {
-        console.log("initializing!");
+        //console.log( "initializing!");
         (function (yo) {
             yo.argument("elementName", { required: true, type: 'string', desc: "element name. Must contains dash symbol!" });
             yo.option("path", { desc: "output path" });
         })(this);
     },
     prompting: function () {
-        console.log("prompting!");
+        //console.log( "prompting!" );
         (function (yo) {
             if (!yo.existsElementsFile())
                 return;
@@ -44,7 +44,7 @@ var generator = yeoman.generators.Base.extend({
         })(this);
     },
     configuring: function () {
-        console.log("configuring!");
+        //console.log( "configuring!" );
         (function (yo) {
             if (yo.elementName.indexOf('-') === -1) {
                 yo.emit('error', new Error('Element name must contain a dash "-"\n' +
@@ -53,8 +53,8 @@ var generator = yeoman.generators.Base.extend({
         })(this);
     },
     element: function () {
+        //console.log( "element writing!");
         var _this = this;
-        console.log("element writing!");
         (function (yo) {
             console.log("writing");
             var el;
@@ -88,7 +88,7 @@ var generator = yeoman.generators.Base.extend({
         })(this);
     },
     end: function () {
-        console.log("end");
+        //console.log( "end" );
         (function (yo) {
         })(this);
     }
