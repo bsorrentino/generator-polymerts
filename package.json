@@ -12,7 +12,6 @@
   "author": "bsorrentino",
   "license": "MIT",
   "dependencies": {
-    "underscore": "^1.8.3",
     "underscore.string": "^3.1.1",
     "yeoman-generator": "^0.20.2"
   }

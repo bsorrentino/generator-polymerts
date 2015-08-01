@@ -1,6 +1,7 @@
 /// <reference path="../typings/yeoman-generator/yeoman-generator.d.ts"/>
 /// <reference path='../typings/underscore.string/underscore.string.d.ts' />
-/// <reference path='../typings/cheerio/cheerio.d.ts' />
+///  <reference path='../typings/cheerio/cheerio.d.ts' />
+//import $ = require('cheerio');
 var path = require("path");
 var _s = require('underscore.string');
 var yeoman = require("yeoman-generator");
