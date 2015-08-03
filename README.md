@@ -25,7 +25,7 @@ Generates a polymer element in `app/elements` and optionally appends an import t
 Example:
 ```bash
 
-yo polymer:el my-element
+yo polymerts:el my-element
 ```
 
 **Note: You must pass in an element name, and the name must contain a dash "-"**
