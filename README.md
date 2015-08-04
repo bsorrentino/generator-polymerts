@@ -33,5 +33,5 @@ yo polymerts:el my-element
 #### Options
 
 ```
---path, override default directory structure, ex: --path foo/bar will put your element in app/elements/foo/bar
+--path, element output path. By default is 'app' and will put your element in folder 'app/elements/'.
 ```
