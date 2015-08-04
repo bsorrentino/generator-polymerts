@@ -1,5 +1,4 @@
 
-<link rel="import" href="<%= pathToBower %>/polymer/polymer.html">
 <% if (dependencies) { dependencies.forEach(function (componentName) { %><link rel="import" href="<%= pathToBower %>/<%= componentName %>/<%= componentName %>.html">
 <% });} %>
 
@@ -7,9 +6,9 @@
 <dom-module id="<%=elementName%>">
   <template>
      <p>I'm a DOM element. This is my local DOM!</p>
-     <p>And this is a test property: <span>{{test}}</span></p>
-     <p><button on-click="handleClick">click me</button></p>
-     <p>The full name is <span>{{fullname}}</span></p>
+     <p>And this is 'greet' property: <span>{{greet}}</span></p>
+     <p><button on-click="handleClick">Change greet</button></p>
+     <p>Computed property 'greetAll' is <span>{{greetAll}}</span></p>
   </template>
 </dom-module>
 
