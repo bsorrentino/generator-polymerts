@@ -1,37 +1,47 @@
-/// <reference path="../../bower_components/polymer-ts/polymer-ts.d.ts"/>
+/// <reference path="<%= pathToBower %>/polymer-ts/polymer-ts.d.ts"/>
 
 @component('<%=elementName%>')
 class <%=className%> extends polymer.Base
 {
-   @property({ type: String, value: "1024" })
-   test: string = "4096";
+   @property({ type: String })
+   greet: string = "Hello";
 
-   @observe("test")
-   testChanged(newValue:string,oldValue:string)
+   @observe("greet")
+   greetChanged(newValue:string, oldValue:string)
    {
-      console.log(`test has changed from ${oldValue} to ${newValue}`);
+      console.log(`greet has changed from ${oldValue} to ${newValue}`);
    }
 
    @computed()
-   fullname(test:string):string
+   greetAll(test:string):string
    {
-      return "Douglas Adams ["+test+"]";
+      return this.test+" to all";
    }
 
-   // listener
+   // event handler 
    handleClick(e:Event)
    {
-      console.log('handle click', e );
-      
-      this.test = this.test + "x";
-      this.fire("behave");
+      this.greet = "Holà";      
+      this.fire("greet-event");
    }
 
-   // lifecycle method
+   @listen("greet-event")
+   onButtonWasClicked(e:Event)
+   {
+      console.log('event "greet-event" received');                  
+   }
+
+
+   // lifecycle methods
    ready()
    {
      console.log( this['is'], "ready!")
    }
+   
+   created() { }
+   attached() { }
+   detached() { }
+
 
 
 }
