@@ -8,8 +8,11 @@ var generator = yeoman.generators.Base.extend({
     constructor: function () {
         yeoman.generators.Base.apply(this, arguments);
         (function (yo) {
-            yo.existsElementsFile = function () {
-                return yo.fs.exists('app/elements/elements.html');
+            yo.parseEl = function (el) {
+                var result = el.properties.filter(function (value, index, array) {
+                    return !(value.function);
+                });
+                console.log(result);
             };
             yo.argument("elementName", { required: true, type: 'string', desc: "element name. Must contains dash symbol!" });
         })(this);
@@ -41,7 +44,7 @@ var generator = yeoman.generators.Base.extend({
             console.log("generating typescript for element", _this.elementName, elementHtml);
             hyd.Analyzer.analyze(elementHtml)
                 .then(function (analyzer) {
-                console.log(analyzer.elementsByTagName[_this.elementName]);
+                yo.parseEl(analyzer.elementsByTagName[_this.elementName]);
             });
         })(this);
     },

@@ -10,6 +10,45 @@ import _s = require('underscore.string');
 
 import yeoman = require("yeoman-generator");
 
+
+module hydrolysis {
+
+  export interface EventDescriptor {
+    
+  }
+  
+  
+  export interface PropertyDescriptor {
+    name:string;
+    type:string; 
+    desc:string;
+    default:any;
+    readOnly?:boolean;
+    params?:Array<Object>;
+    published?:boolean;
+    function?:boolean;
+    private?:boolean;
+    
+  }
+  export interface ElementDescriptor {
+    type:string;
+    desc:string;    
+
+    events:Array<Object>;
+    properties:Array<PropertyDescriptor>;
+    
+    is:string;
+
+    scriptElement:Object;
+    contentHref:string;
+    jsdoc:Object;
+    
+    demos:Array<Object>;
+    hero:string;
+          
+  }  
+}
+
 module generator {
 
   export interface IMemFsEditor {
@@ -34,7 +73,7 @@ module generator {
     options:IOptions;
    
     // custom
-    existsElementsFile();
+    parseEl( el:hydrolysis.ElementDescriptor );
   }
  
 }
@@ -44,8 +83,13 @@ var generator = yeoman.generators.Base.extend({
     yeoman.generators.Base.apply(this, arguments);
     ((yo:generator.IElement) => {
     
-      yo.existsElementsFile  = () => {
-       return  yo.fs.exists('app/elements/elements.html');
+      yo.parseEl  = (el:hydrolysis.ElementDescriptor) => {
+           
+        var result = el.properties.filter( ( value, index, array ) => {
+          return !((value.function) || (value.private))  ;
+        });
+        
+         console.log( result );
       }
       
       yo.argument("elementName",
@@ -97,7 +141,8 @@ var generator = yeoman.generators.Base.extend({
       
       hyd.Analyzer.analyze( elementHtml )
         .then((analyzer) => {
-        console.log(analyzer.elementsByTagName[this.elementName])
+        
+          yo.parseEl( analyzer.elementsByTagName[this.elementName] );
       });
 
     })(this);
