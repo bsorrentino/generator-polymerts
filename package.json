@@ -7,11 +7,12 @@
     "yeoman-generator"
   ],
   "files": [
-    "el"
+    "el", "gen"
   ],
   "author": "bsorrentino",
   "license": "MIT",
   "dependencies": {
+    "hydrolysis": "^1.15.3",
     "underscore.string": "^3.1.1",
     "yeoman-generator": "^0.20.2"
   }
