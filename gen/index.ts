@@ -63,21 +63,24 @@ module generator {
 
 
   export interface IOptions {
+    output:string;
   }
   
   export interface IElement extends yeoman.IYeomanGenerator {
     fs:IMemFsEditor;
 
     elementName:string;
-
+    className:string;
     options:IOptions;
    
     // custom
+    publicProperties:Array<hydrolysis.PropertyDescriptor>;
+    
     parseEl( el:hydrolysis.ElementDescriptor );
   }
  
 }
- 
+
 var generator = yeoman.generators.Base.extend({
   constructor: function () {
     yeoman.generators.Base.apply(this, arguments);
@@ -85,16 +88,23 @@ var generator = yeoman.generators.Base.extend({
     
       yo.parseEl  = (el:hydrolysis.ElementDescriptor) => {
            
-        var result = el.properties.filter( ( value, index, array ) => {
+        yo.publicProperties = el.properties.filter( ( value, index, array ) => {
           return !((value.function) || (value.private))  ;
         });
         
-         console.log( result );
+        console.log(  "recompile works!" );
+        
+        yo.template( path.join(__dirname, 'templates/_element.ts'),
+           path.join( yo.options.output, yo.elementName.concat(".ts")));
+           
+         
       }
       
       yo.argument("elementName",
         {required:true, type:'string' ,desc:"element name. Must contains dash symbol!"});
-
+ 
+      yo.option("output",{desc:"element output path", defaults:"typings/polymer"})  
+ 
     })(this);
     
   },
@@ -138,10 +148,13 @@ var generator = yeoman.generators.Base.extend({
       var elementHtml = pathToEl.concat('.html');
       
       console.log( "generating typescript for element", this.elementName, elementHtml );
+       
+      yo.className = _s.classify(yo.elementName)
       
       hyd.Analyzer.analyze( elementHtml )
         .then((analyzer) => {
         
+
           yo.parseEl( analyzer.elementsByTagName[this.elementName] );
       });
 

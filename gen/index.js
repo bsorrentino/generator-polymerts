@@ -3,18 +3,21 @@
 ///  <reference path='../typings/cheerio/cheerio.d.ts' />
 var hyd = require('hydrolysis');
 var path = require("path");
+var _s = require('underscore.string');
 var yeoman = require("yeoman-generator");
 var generator = yeoman.generators.Base.extend({
     constructor: function () {
         yeoman.generators.Base.apply(this, arguments);
         (function (yo) {
             yo.parseEl = function (el) {
-                var result = el.properties.filter(function (value, index, array) {
-                    return !(value.function);
+                yo.publicProperties = el.properties.filter(function (value, index, array) {
+                    return !((value.function) || (value.private));
                 });
-                console.log(result);
+                console.log("recompile works!");
+                yo.template(path.join(__dirname, 'templates/_element.ts'), path.join(yo.options.output, yo.elementName.concat(".ts")));
             };
             yo.argument("elementName", { required: true, type: 'string', desc: "element name. Must contains dash symbol!" });
+            yo.option("output", { desc: "element output path", defaults: "typings/polymer" });
         })(this);
     },
     initializing: function () {
@@ -42,6 +45,7 @@ var generator = yeoman.generators.Base.extend({
             var pathToEl = path.join(pathBower, el);
             var elementHtml = pathToEl.concat('.html');
             console.log("generating typescript for element", _this.elementName, elementHtml);
+            yo.className = _s.classify(yo.elementName);
             hyd.Analyzer.analyze(elementHtml)
                 .then(function (analyzer) {
                 yo.parseEl(analyzer.elementsByTagName[_this.elementName]);

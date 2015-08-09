@@ -1,7 +1,11 @@
 
 interface <%=className%> 
 {
-<% if (properties) { properties.forEach(function (property) { %><%= property.name%>:any;
+<% if (publicProperties) { publicProperties.forEach(function (p) { %>
+	/*
+	<%=p.desc%>
+	*/
+	<%= p.name%>:<%=p.type.toLowerCase()%>;
 <% });} %>
       
 }
