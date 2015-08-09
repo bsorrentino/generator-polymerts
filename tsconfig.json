@@ -7,7 +7,9 @@
         "noImplicitAny": false,
         "removeComments": true,
         "noLib": false,
-        "watch":true
+        "sourceMap":true
+        
+        
     },
     "filesGlob": [
         "./**/*.ts",

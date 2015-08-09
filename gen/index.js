@@ -9,12 +9,39 @@ var generator = yeoman.generators.Base.extend({
     constructor: function () {
         yeoman.generators.Base.apply(this, arguments);
         (function (yo) {
+            yo.templateType = function (p) {
+                switch (p.type) {
+                    case '*':
+                        return 'any';
+                    case 'Array':
+                        return 'Array<any>';
+                    case 'Object':
+                        return p.type;
+                    default:
+                        return p.type.toLowerCase();
+                }
+            };
+            yo.templateParams = function (params) {
+                if (!params)
+                    return "";
+                return params.map(function (value, index, array) {
+                    return value.name;
+                }).join(', ');
+            };
             yo.parseEl = function (el) {
-                yo.publicProperties = el.properties.filter(function (value, index, array) {
+                console.log(el);
+                yo.element = el;
+                yo.publicProps = el.properties.filter(function (value, index, array) {
                     return !((value.function) || (value.private));
                 });
-                console.log("recompile works!");
-                yo.template(path.join(__dirname, 'templates/_element.ts'), path.join(yo.options.output, yo.elementName.concat(".ts")));
+                yo.publicMethods = el.properties.filter(function (value, index, array) {
+                    //console.log( "params",  value.params, yo.templateParams( value.params ) );
+                    return ((value.function) && !(value.private));
+                });
+                var target = path.join(yo.options.output, yo.elementName.concat(".ts"));
+                yo.template(path.join(__dirname, 'templates/_element.ts'), target);
+                var content = yo.fs.read(target);
+                yo.fs.write(target, _s.unescapeHTML(content));
             };
             yo.argument("elementName", { required: true, type: 'string', desc: "element name. Must contains dash symbol!" });
             yo.option("output", { desc: "element output path", defaults: "typings/polymer" });

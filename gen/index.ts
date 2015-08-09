@@ -13,15 +13,20 @@ import yeoman = require("yeoman-generator");
 
 module hydrolysis {
 
-  export interface EventDescriptor {
+  export interface Descriptor {
+    desc:string;
     
+  }
+  export interface EventDescriptor extends Descriptor {
+       jsdoc:Array<Object>;
+       name:string;
+       params:Array<Object>;    
   }
   
   
-  export interface PropertyDescriptor {
+  export interface PropertyDescriptor extends Descriptor{
     name:string;
     type:string; 
-    desc:string;
     default:any;
     readOnly?:boolean;
     params?:Array<Object>;
@@ -30,11 +35,11 @@ module hydrolysis {
     private?:boolean;
     
   }
-  export interface ElementDescriptor {
+  export interface ElementDescriptor extends Descriptor {
     type:string;
-    desc:string;    
 
-    events:Array<Object>;
+    behaviors:Array<string>;
+    events:Array<EventDescriptor>;
     properties:Array<PropertyDescriptor>;
     
     is:string;
@@ -66,17 +71,21 @@ module generator {
     output:string;
   }
   
-  export interface IElement extends yeoman.IYeomanGenerator {
+  export interface ThisGenerator extends yeoman.IYeomanGenerator {
     fs:IMemFsEditor;
 
     elementName:string;
     className:string;
     options:IOptions;
-   
     // custom
-    publicProperties:Array<hydrolysis.PropertyDescriptor>;
+     
+    element:hydrolysis.ElementDescriptor
+    publicProps:Array<hydrolysis.PropertyDescriptor>;
+    publicMethods:Array<hydrolysis.PropertyDescriptor>;
     
     parseEl( el:hydrolysis.ElementDescriptor );
+    templateParams( params:Array<Object> ):string ;
+    templateType( p:hydrolysis.PropertyDescriptor ):string;
   }
  
 }
@@ -84,22 +93,54 @@ module generator {
 var generator = yeoman.generators.Base.extend({
   constructor: function () {
     yeoman.generators.Base.apply(this, arguments);
-    ((yo:generator.IElement) => {
-    
-      yo.parseEl  = (el:hydrolysis.ElementDescriptor) => {
-           
-        yo.publicProperties = el.properties.filter( ( value, index, array ) => {
-          return !((value.function) || (value.private))  ;
-        });
+    ((yo:generator.ThisGenerator) => {
+      
+      yo.templateType = ( p:hydrolysis.PropertyDescriptor ):string => {
         
-        console.log(  "recompile works!" );
-        
-        yo.template( path.join(__dirname, 'templates/_element.ts'),
-           path.join( yo.options.output, yo.elementName.concat(".ts")));
-           
-         
+        switch(p.type){
+          case'*':  
+            return 'any';
+          case 'Array':
+            return 'Array<any>'
+          case 'Object':
+            return p.type;
+          default:
+            return p.type.toLowerCase();
+        }
       }
       
+      yo.templateParams = ( params?:Array<Object> ):string  => {
+        
+        if( !params ) return "";
+
+        return params.map<string>( ( value, index, array:Object[]) => {               
+          return value.name ;      
+        }).join(', ');
+      }
+    
+      yo.parseEl  = (el:hydrolysis.ElementDescriptor) => {
+        
+        console.log( el );
+        
+        yo.element = el;
+        
+        yo.publicProps = el.properties.filter( ( value, index, array ) => {
+          return !((value.function) || (value.private))  ;
+        });
+        yo.publicMethods = el.properties.filter( ( value, index, array ) => {
+          //console.log( "params",  value.params, yo.templateParams( value.params ) );
+          return ((value.function) && !(value.private))  ;
+        });
+        
+        var target = path.join( yo.options.output, yo.elementName.concat(".ts"));
+        
+        yo.template( path.join(__dirname, 'templates/_element.ts'), target);
+        
+        
+        var content:string = yo.fs.read(target);
+        yo.fs.write( target, _s.unescapeHTML(content) );
+      }
+
       yo.argument("elementName",
         {required:true, type:'string' ,desc:"element name. Must contains dash symbol!"});
  
@@ -109,7 +150,7 @@ var generator = yeoman.generators.Base.extend({
     
   },
   initializing: function() {
-    ((yo:generator.IElement) => {
+    ((yo:generator.ThisGenerator) => {
       
       if (yo.elementName.indexOf('-') === -1) {
         yo.emit('error', new Error(
@@ -123,20 +164,20 @@ var generator = yeoman.generators.Base.extend({
 
   },
   prompting: function () {
-    ((yo:generator.IElement) => {
+    ((yo:generator.ThisGenerator) => {
 
     })(this);
 
   },
   configuring: function() {
-    ((yo:generator.IElement) => {
+    ((yo:generator.ThisGenerator) => {
 
 
     })(this);
 
   },
   gen : function() {
-    ((yo:generator.IElement) => {
+    ((yo:generator.ThisGenerator) => {
       
       
       var pathBower = path.join(process.cwd(), 'bower_components')
@@ -162,7 +203,7 @@ var generator = yeoman.generators.Base.extend({
 
   },
   end:function() {
-    ((yo:generator.IElement) => {
+    ((yo:generator.ThisGenerator) => {
 
     })(this);
 
