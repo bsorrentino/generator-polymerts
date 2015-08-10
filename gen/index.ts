@@ -52,6 +52,19 @@ module hydrolysis {
     hero:string;
           
   }  
+ 
+  export interface BehaviorDescriptor extends ElementDescriptor  { }
+
+
+  export interface Analyzer {
+    
+    behaviors:Array<BehaviorDescriptor>;
+
+    elementsByTagName:{ [name: string]: ElementDescriptor };
+    
+    
+  }
+  
 }
 
 module generator {
@@ -68,24 +81,28 @@ module generator {
 
 
   export interface IOptions {
+    path?:string;
     output:string;
+    
   }
   
   export interface ThisGenerator extends yeoman.IYeomanGenerator {
     fs:IMemFsEditor;
-
-    elementName:string;
-    className:string;
-    options:IOptions;
-    // custom
-     
-    element:hydrolysis.ElementDescriptor
-    publicProps:Array<hydrolysis.PropertyDescriptor>;
-    publicMethods:Array<hydrolysis.PropertyDescriptor>;
     
-    parseEl( el:hydrolysis.ElementDescriptor );
+    mkdir( path:string );
+
+    // custom
+
+    options:IOptions;
+    elementName:string; 
+    
+    parseBehavior( el:hydrolysis.BehaviorDescriptor );
+    parse( analyzer:hydrolysis.Analyzer );
+    
     templateParams( params:Array<Object> ):string ;
     templateType( p:hydrolysis.PropertyDescriptor ):string;
+    templateDesc( p:hydrolysis.Descriptor ):string;  
+    unescapeFile( path:string );
   }
  
 }
@@ -95,6 +112,17 @@ var generator = yeoman.generators.Base.extend({
     yeoman.generators.Base.apply(this, arguments);
     ((yo:generator.ThisGenerator) => {
       
+      yo.unescapeFile = ( path:string ) => {
+
+        var content = yo.fs.read(path);
+        yo.fs.write( path, _s.unescapeHTML(content.toString()) );
+        
+      }
+      yo.templateDesc = ( p:hydrolysis.Descriptor ):string => {      
+        var r = new RegExp( '\\*/', 'g');
+        return p.desc.replace( r, '' );
+      };
+
       yo.templateType = ( p:hydrolysis.PropertyDescriptor ):string => {
         
         switch(p.type){
@@ -117,34 +145,98 @@ var generator = yeoman.generators.Base.extend({
           return value.name ;      
         }).join(', ');
       }
+
     
-      yo.parseEl  = (el:hydrolysis.ElementDescriptor) => {
+      yo.parseBehavior  = (el:hydrolysis.BehaviorDescriptor) => {
+
+        console.log( "parseBehaivior", el.properties );
         
-        console.log( el );
+        var tk =  el.is.split('.');
         
-        yo.element = el;
+        var module = tk[0];
+        var name = tk[1]; 
+                            
+        var target = path.join( yo.options.output, name.concat(".d.ts"));
         
-        yo.publicProps = el.properties.filter( ( value, index, array ) => {
+        var publicProps = el.properties.filter( ( value, index, array ) => {
           return !((value.function) || (value.private))  ;
         });
-        yo.publicMethods = el.properties.filter( ( value, index, array ) => {
-          //console.log( "params",  value.params, yo.templateParams( value.params ) );
+        
+        var publicMethods = el.properties.filter( ( value, index, array ) => {
           return ((value.function) && !(value.private))  ;
         });
+
         
-        var target = path.join( yo.options.output, yo.elementName.concat(".ts"));
+        yo.template( path.join(__dirname, 'templates/_behaviour.ts'), target, 
+              { element: el,
+                moduleName:module,
+                className:_s.classify(name),
+                props:publicProps,
+                methods:publicMethods,
+                templateParams:yo.templateParams,
+                templateType:yo.templateType,
+                templateDesc:yo.templateDesc
+              } 
+        );
+           
+        yo.unescapeFile(target);
+      }
+      
+      yo.parse  = (analyzer:hydrolysis.Analyzer) => {
+       
+        var el = analyzer.elementsByTagName[this.elementName];
+         
         
-        yo.template( path.join(__dirname, 'templates/_element.ts'), target);
+        yo.mkdir( yo.options.output );
+
+        console.log( "behaviors", analyzer.behaviors );             
+        if( analyzer.behaviors ) {
+            var set = {};
+            
+            analyzer.behaviors.forEach( (v, index, array ) => {   
+                if( !set[v.is] ) { // apply once
+                  set[v.is] = v;
+                  yo.parseBehavior(v);
+                }
+            });
+                 
+        }  
+         
         
+        var publicProps = el.properties.filter( ( value, index, array ) => {
+          return !((value.function) || (value.private))  ;
+        });
+            
+        var publicMethods = el.properties.filter( ( value, index, array ) => {
+          return ((value.function) && !(value.private))  ;
+        });
+
+        var module = el.is.split('-')[0];
         
-        var content:string = yo.fs.read(target);
-        yo.fs.write( target, _s.unescapeHTML(content) );
+        var target = path.join( yo.options.output, el.is.concat(".d.ts"));
+       
+        yo.template( path.join(__dirname, 'templates/_element.ts'), target , 
+              { element: el,
+                moduleName:module,
+                className:_s.classify(el.is),
+                props:publicProps,
+                methods:publicMethods,
+                templateParams:yo.templateParams,
+                templateType:yo.templateType,
+                templateDesc:yo.templateDesc
+
+              } 
+        );
+
+        yo.unescapeFile(target);
+        
       }
 
       yo.argument("elementName",
         {required:true, type:'string' ,desc:"element name. Must contains dash symbol!"});
  
-      yo.option("output",{desc:"element output path", defaults:"typings/polymer"})  
+      yo.option("path",{desc:"element source path"}); 
+      yo.option("output",{desc:"element output path", defaults:"typings/polymer"}) ;
  
     })(this);
     
@@ -180,9 +272,11 @@ var generator = yeoman.generators.Base.extend({
     ((yo:generator.ThisGenerator) => {
       
       
-      var pathBower = path.join(process.cwd(), 'bower_components')
-      // el = "x-foo/x-foo"
-      var  el = path.join(this.elementName, this.elementName);
+      var pathBower = path.join(process.cwd(), 'bower_components') d
+
+      var el =  ( yo.options.path ) ? 
+        path.join(yo.options.path, this.elementName) :
+        path.join(this.elementName, this.elementName);
 
       var pathToEl = path.join(pathBower, el);
   
@@ -190,13 +284,10 @@ var generator = yeoman.generators.Base.extend({
       
       console.log( "generating typescript for element", this.elementName, elementHtml );
        
-      yo.className = _s.classify(yo.elementName)
-      
       hyd.Analyzer.analyze( elementHtml )
         .then((analyzer) => {
         
-
-          yo.parseEl( analyzer.elementsByTagName[this.elementName] );
+          yo.parse( analyzer );
       });
 
     })(this);

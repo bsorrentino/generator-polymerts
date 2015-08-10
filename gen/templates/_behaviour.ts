@@ -1,8 +1,8 @@
 
 
 declare module <%=moduleName%> {
-	
-	/* <%=templateDesc(element) %>
+
+	/* <%= templateDesc(element) %>
 	*/
 	interface <%=className%> <% if( element.behaviors ) { %> extends <%=element.behaviors.join(',')%><% } %>
 	{	
@@ -24,8 +24,6 @@ declare module <%=moduleName%> {
 		*/
 		<%= m.name%>(<%=templateParams( m.params )%>);
 	<% });} %>
-	
-	      
-	}
 
+	}	
 }
