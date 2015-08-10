@@ -1,13 +1,17 @@
 {
   "name": "generator-polymerts",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Yeoman Generator for PolymerTS",
   "scripts": {},
   "keywords": [
-    "yeoman-generator"
+    "yeoman-generator",
+    "polymer",
+    "typescript"
   ],
+  "repository": "bsorrentino/generator-polymerts",
   "files": [
-    "el", "gen"
+    "el", 
+    "gen"
   ],
   "author": "bsorrentino",
   "license": "MIT",
