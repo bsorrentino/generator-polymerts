@@ -81,8 +81,8 @@ module generator {
 
 
   export interface IOptions {
-    path?:string;
-    output:string;
+    elpath:string;
+    path:string;
     
   }
   
@@ -111,6 +111,13 @@ var generator = yeoman.generators.Base.extend({
   constructor: function () {
     yeoman.generators.Base.apply(this, arguments);
     ((yo:generator.ThisGenerator) => {
+      
+      yo.argument("elementName",
+        {required:true, type:'string' ,desc:"element name. Must contains dash symbol!"});
+ 
+      yo.option("elpath",{desc:"element source path"}); 
+      yo.option("path",{desc:"element output path", defaults:"typings/polymer"}) ;
+
       
       yo.unescapeFile = ( path:string ) => {
 
@@ -155,20 +162,16 @@ var generator = yeoman.generators.Base.extend({
         var module = ( tk.length == 1 ) ? "Polymer" : tk[0];
         var name = ( tk.length == 1 ) ? tk[0] : tk[1]; 
                             
-        var target = path.join( yo.options.output, name.concat(".d.ts"));
-        console.log( "parseBehaivior", target );
+        var target = path.join( yo.options.path, name.concat(".d.ts"));
         
         var publicProps = el.properties.filter( ( value, index, array ) => {
           return !((value.function) || (value.private))  ;
         });
-        console.log( "parseBehaivior", publicProps );
         
         var publicMethods = el.properties.filter( ( value, index, array ) => {
           return ((value.function) && !(value.private))  ;
         });
 
-        console.log( "parseBehaivior",publicMethods );
-        
         yo.template( path.join(__dirname, 'templates/_behaviour.ts'), target, 
               { element: el,
                 moduleName:module,
@@ -189,9 +192,8 @@ var generator = yeoman.generators.Base.extend({
         var el = analyzer.elementsByTagName[this.elementName];
          
         
-        yo.mkdir( yo.options.output );
+        yo.mkdir( yo.options.path );
 
-        console.log( "behaviors", analyzer.behaviors );             
         if( analyzer.behaviors ) {
             var set = {};
             
@@ -215,7 +217,7 @@ var generator = yeoman.generators.Base.extend({
 
         var module = el.is.split('-')[0];
         
-        var target = path.join( yo.options.output, el.is.concat(".d.ts"));
+        var target = path.join( yo.options.path, el.is.concat(".d.ts"));
        
         yo.template( path.join(__dirname, 'templates/_element.ts'), target , 
               { element: el,
@@ -234,11 +236,6 @@ var generator = yeoman.generators.Base.extend({
         
       }
 
-      yo.argument("elementName",
-        {required:true, type:'string' ,desc:"element name. Must contains dash symbol!"});
- 
-      yo.option("path",{desc:"element source path"}); 
-      yo.option("output",{desc:"element output path", defaults:"typings/polymer"}) ;
  
     })(this);
     
@@ -274,10 +271,10 @@ var generator = yeoman.generators.Base.extend({
     ((yo:generator.ThisGenerator) => {
       
       
-      var pathBower = path.join(process.cwd(), 'bower_components') d
+      var pathBower = path.join(process.cwd(), 'bower_components');
 
-      var el =  ( yo.options.path ) ? 
-        path.join(yo.options.path, this.elementName) :
+      var el =  ( yo.options.elpath ) ? 
+        path.join(yo.options.elpath, this.elementName) :
         path.join(this.elementName, this.elementName);
 
       var pathToEl = path.join(pathBower, el);
