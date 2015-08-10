@@ -149,23 +149,25 @@ var generator = yeoman.generators.Base.extend({
     
       yo.parseBehavior  = (el:hydrolysis.BehaviorDescriptor) => {
 
-        console.log( "parseBehaivior", el.properties );
         
         var tk =  el.is.split('.');
-        
-        var module = tk[0];
-        var name = tk[1]; 
+
+        var module = ( tk.length == 1 ) ? "Polymer" : tk[0];
+        var name = ( tk.length == 1 ) ? tk[0] : tk[1]; 
                             
         var target = path.join( yo.options.output, name.concat(".d.ts"));
+        console.log( "parseBehaivior", target );
         
         var publicProps = el.properties.filter( ( value, index, array ) => {
           return !((value.function) || (value.private))  ;
         });
+        console.log( "parseBehaivior", publicProps );
         
         var publicMethods = el.properties.filter( ( value, index, array ) => {
           return ((value.function) && !(value.private))  ;
         });
 
+        console.log( "parseBehaivior",publicMethods );
         
         yo.template( path.join(__dirname, 'templates/_behaviour.ts'), target, 
               { element: el,
