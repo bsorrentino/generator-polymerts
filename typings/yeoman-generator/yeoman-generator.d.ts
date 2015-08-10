@@ -28,7 +28,7 @@ declare module yo {
     async(): Function;
     templatePath( ...path:string[] ):string;
 
-    template( src:string, dest:string );
+    template( src:string, dest:string, context?:Object );
     readFileAsString(path:string):string;  
     writeFileFromString( content:string, path:string);
 
