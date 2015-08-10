@@ -63,6 +63,11 @@ var generator = yeoman.generators.Base.extend({
       }
       
       yo.dependencies = [ "polymer-ts.html" ];
+
+      yo.argument("elementName",
+        {required:true, type:'string' ,desc:"element name. Must contains dash symbol!"});
+
+      yo.option("path",{desc:"element output path", defaults:"app"})  
       
     })(this);
     
@@ -71,11 +76,15 @@ var generator = yeoman.generators.Base.extend({
     //console.log( "initializing!");
 
     ((yo:generator.IElement) => {
+      
+      if (yo.elementName.indexOf('-') === -1) {
+        yo.emit('error', new Error(
+          'Element name must contain a dash "-"\n' +
+          'ex: yo polymer:el my-element'
+        ));
+      }
 
-      yo.argument("elementName",
-        {required:true, type:'string' ,desc:"element name. Must contains dash symbol!"});
 
-      yo.option("path",{desc:"output path"})  
     })(this);
 
 
@@ -112,12 +121,6 @@ var generator = yeoman.generators.Base.extend({
 
     ((yo:generator.IElement) => {
 
-      if (yo.elementName.indexOf('-') === -1) {
-            yo.emit('error', new Error(
-              'Element name must contain a dash "-"\n' +
-              'ex: yo polymer:el my-element'
-            ));
-          }
 
     })(this);
 
@@ -130,34 +133,19 @@ var generator = yeoman.generators.Base.extend({
         
         console.log( "writing" );
         
-        var el:string;
-        var pathToEl:string;
+        // el = "x-foo/x-foo"
+        var  el = path.join(this.elementName, this.elementName);
 
-        if (this.options.path) {
+        // pathToEl = "app/elements/foo/bar/x-foo"
+        var pathToEl = path.join(yo.options.path, "elements", el);
     
-          // --path foo/bar
-          // el = "foo/bar/x-foo"
-          el = path.join(yo.options.path, yo.elementName);
-    
-          // pathToEl = "app/elements/foo/bar/x-foo"
-          pathToEl = path.join('app/elements', el);
-    
-        } else {
-    
-          // el = "x-foo/x-foo"
-          el = path.join(this.elementName, this.elementName);
-    
-          // pathToEl = "app/elements/x-foo/x-foo"
-          pathToEl = path.join('app/elements', el);
-    
-        }
-
+ 
         console.log( "el", el, "pathToEl", pathToEl);
 
         // Used by element template
         yo.pathToBower = path.relative(
           path.dirname(pathToEl),
-          path.join(process.cwd(), 'app/bower_components')
+          path.join(process.cwd(), yo.options.path, 'bower_components')
         );
         
         yo.template(path.join(__dirname, 'templates/_element.html'), pathToEl.concat('.html'));
@@ -169,10 +157,11 @@ var generator = yeoman.generators.Base.extend({
         // Wire up the dependency in elements.html
         if (yo.includeImport && yo.existsElementsFile()) {
   
-            var file = yo.fs.read('app/elements/elements.html');
+            var elementsPath = path.join( yo.options.path,'elements/elements.html')
+            var file = yo.fs.read(elementsPath);
             el = el.replace('\\', '/');
             file += '<link rel="import" href="' + el + '.html">\n';
-            yo.fs.write('app/elements/elements.html', file);
+            yo.fs.write(elementsPath, file);
         }
 
       })(this);

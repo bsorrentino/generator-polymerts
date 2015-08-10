@@ -1,17 +1,22 @@
 {
   "name": "generator-polymerts",
-  "version": "0.1.1",
+  "version": "0.3.0",
   "description": "Yeoman Generator for PolymerTS",
   "scripts": {},
   "keywords": [
-    "yeoman-generator"
+    "yeoman-generator",
+    "polymer",
+    "typescript"
   ],
+  "repository": "bsorrentino/generator-polymerts",
   "files": [
-    "el"
+    "el", 
+    "gen"
   ],
   "author": "bsorrentino",
   "license": "MIT",
   "dependencies": {
+    "hydrolysis": "^1.15.3",
     "underscore.string": "^3.1.1",
     "yeoman-generator": "^0.20.2"
   }
