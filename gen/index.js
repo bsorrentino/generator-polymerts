@@ -1,7 +1,9 @@
 /// <reference path="../typings/yeoman-generator/yeoman-generator.d.ts"/>
 /// <reference path='../typings/underscore.string/underscore.string.d.ts' />
 ///  <reference path='../typings/cheerio/cheerio.d.ts' />
+///  <reference path='../typings/mkdirp/mkdirp.d.ts' />
 var hyd = require('hydrolysis');
+var mkdirp = require("mkdirp");
 var path = require("path");
 var _s = require('underscore.string');
 var yeoman = require("yeoman-generator");
@@ -17,9 +19,11 @@ var generator = yeoman.generators.Base.extend({
                 var content = yo.fs.read(path);
                 yo.fs.write(path, _s.unescapeHTML(content.toString()));
             };
-            yo.templateDesc = function (p) {
-                var r = new RegExp('\\*/', 'g');
-                return p.desc.replace(r, '');
+            yo.templateDesc = function (p, tabs) {
+                if (tabs === void 0) { tabs = '\t'; }
+                var newline = new RegExp('\\n', 'g');
+                var comment = new RegExp('\\*/', 'g');
+                return p.desc.replace(newline, '\n\t' + tabs).replace(comment, '');
             };
             yo.templateType = function (p) {
                 switch (p.type) {
@@ -51,7 +55,7 @@ var generator = yeoman.generators.Base.extend({
                 var publicMethods = el.properties.filter(function (value, index, array) {
                     return ((value.function) && !(value.private));
                 });
-                yo.template(path.join(__dirname, 'templates/_behaviour.ts'), target, { element: el,
+                yo.template(path.join(__dirname, 'templates/_behaviour.tst'), target, { element: el,
                     moduleName: module,
                     className: _s.classify(name),
                     props: publicProps,
@@ -64,7 +68,7 @@ var generator = yeoman.generators.Base.extend({
             };
             yo.parse = function (analyzer) {
                 var el = analyzer.elementsByTagName[_this.elementName];
-                yo.mkdir(yo.options.path);
+                mkdirp.sync(yo.options.path);
                 if (analyzer.behaviors) {
                     var set = {};
                     analyzer.behaviors.forEach(function (v, index, array) {
@@ -82,7 +86,7 @@ var generator = yeoman.generators.Base.extend({
                 });
                 var module = el.is.split('-')[0];
                 var target = path.join(yo.options.path, el.is.concat(".d.ts"));
-                yo.template(path.join(__dirname, 'templates/_element.ts'), target, { element: el,
+                yo.template(path.join(__dirname, 'templates/_element.tst'), target, { element: el,
                     moduleName: module,
                     className: _s.classify(el.is),
                     props: publicProps,
