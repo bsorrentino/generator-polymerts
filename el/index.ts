@@ -152,7 +152,7 @@ var generator = yeoman.generators.Base.extend({
         
         yo.className = _s.classify(yo.elementName)
   
-        yo.template(path.join(__dirname, 'templates/_element.ts'), pathToEl.concat('.ts'));
+        yo.template(path.join(__dirname, 'templates/_element.tst'), pathToEl.concat('.ts'));
     
         // Wire up the dependency in elements.html
         if (yo.includeImport && yo.existsElementsFile()) {
