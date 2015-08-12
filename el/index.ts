@@ -62,7 +62,7 @@ var generator = yeoman.generators.Base.extend({
        return  yo.fs.exists('app/elements/elements.html');
       }
       
-      yo.dependencies = [ "polymer-ts.html" ];
+      yo.dependencies = [ "polymer-ts" ];
 
       yo.argument("elementName",
         {required:true, type:'string' ,desc:"element name. Must contains dash symbol!"});

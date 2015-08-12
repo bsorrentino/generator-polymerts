@@ -13,7 +13,7 @@ var generator = yeoman.generators.Base.extend({
             yo.existsElementsFile = function () {
                 return yo.fs.exists('app/elements/elements.html');
             };
-            yo.dependencies = ["polymer-ts.html"];
+            yo.dependencies = ["polymer-ts"];
             yo.argument("elementName", { required: true, type: 'string', desc: "element name. Must contains dash symbol!" });
             yo.option("path", { desc: "element output path", defaults: "app" });
         })(this);
