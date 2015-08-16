@@ -62,7 +62,7 @@ var generator = yeoman.generators.Base.extend({
        return  yo.fs.exists('app/elements/elements.html');
       }
       
-      yo.dependencies = [ "polymer-ts.html" ];
+      yo.dependencies = [ "polymer-ts" ];
 
       yo.argument("elementName",
         {required:true, type:'string' ,desc:"element name. Must contains dash symbol!"});
@@ -152,7 +152,7 @@ var generator = yeoman.generators.Base.extend({
         
         yo.className = _s.classify(yo.elementName)
   
-        yo.template(path.join(__dirname, 'templates/_element.ts'), pathToEl.concat('.ts'));
+        yo.template(path.join(__dirname, 'templates/_element.tst'), pathToEl.concat('.ts'));
     
         // Wire up the dependency in elements.html
         if (yo.includeImport && yo.existsElementsFile()) {

@@ -14,13 +14,13 @@ declare module <%=moduleName%> {
 	*/<%}%>
 	
 	<%  if (props) { props.forEach(function (p) { %>
-		/*<%=p.desc%> 
+		/*<%=templateDesc(p, '\t\t')%> 
 		*/
 		<%= p.name%>:<%=templateType(p)%>;
 	<% });} %>
 	
 	<% if (methods) { methods.forEach(function (m) { %>
-		/*<%=m.desc%> 
+		/*<%=templateDesc(m, '\t\t')%> 
 		*/
 		<%= m.name%>(<%=templateParams( m.params )%>);
 	<% });} %>

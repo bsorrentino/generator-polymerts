@@ -14,18 +14,17 @@ declare module <%=moduleName%> {
 	*/<%}%>
 	
 	<%  if (props) { props.forEach(function (p) { %>
-		/*<%=p.desc%> 
+		/*<%=templateDesc(p)%> 
 		*/
 		<%= p.name%>:<%=templateType(p)%>;
 	<% });} %>
 	
 	<% if (methods) { methods.forEach(function (m) { %>
-		/*<%=m.desc%> 
+		/*<%=templateDesc(m)%> 
 		*/
 		<%= m.name%>(<%=templateParams( m.params )%>);
 	<% });} %>
-	
-	      
+   
 	}
 
 }

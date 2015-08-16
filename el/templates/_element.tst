@@ -1,4 +1,4 @@
-/// <reference path="<%= pathToBower %>/polymer-ts/polymer-ts.d.ts"/>
+/// <reference path="../<%= pathToBower %>/polymer-ts/polymer-ts.d.ts"/>
 
 @component('<%=elementName%>')
 class <%=className%> extends polymer.Base
