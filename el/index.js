@@ -13,9 +13,10 @@ var generator = yeoman.generators.Base.extend({
             yo.existsElementsFile = function () {
                 return yo.fs.exists('app/elements/elements.html');
             };
-            yo.dependencies = ["polymer-ts"];
+            yo.dependencies = ["polymer", "polymer-ts"];
             yo.argument("elementName", { required: true, type: 'string', desc: "element name. Must contains dash symbol!" });
             yo.option("path", { desc: "element output path", defaults: "app" });
+            yo.option("nodecorator", { desc: "generate element without decorator. TS < 1.5 compatibility", defaults: false });
         })(this);
     },
     initializing: function () {
@@ -65,8 +66,10 @@ var generator = yeoman.generators.Base.extend({
             // Used by element template
             yo.pathToBower = path.relative(path.dirname(pathToEl), path.join(process.cwd(), yo.options.path, 'bower_components'));
             yo.template(path.join(__dirname, 'templates/_element.html'), pathToEl.concat('.html'));
+            yo.template(path.join(__dirname, 'templates/_demo.html'), path.join(yo.options.path, "elements", _this.elementName, "demo.html"));
             yo.className = _s.classify(yo.elementName);
-            yo.template(path.join(__dirname, 'templates/_element.tst'), pathToEl.concat('.ts'));
+            var templateEl = (!yo.options.nodecorator) ? 'templates/_element.tst' : 'templates/_element-no-decorator.tst';
+            yo.template(path.join(__dirname, templateEl), pathToEl.concat('.ts'));
             // Wire up the dependency in elements.html
             if (yo.includeImport && yo.existsElementsFile()) {
                 var elementsPath = path.join(yo.options.path, 'elements/elements.html');
