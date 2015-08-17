@@ -24,9 +24,8 @@ It is thought to work joined with [Polymer Starter Kit](https://developers.googl
 Generates a polymer element in `app/elements` and optionally appends an import to `app/elements/elements.html`.
 
 Example:
-```bash
-
-yo polymerts:el my-element [--path ]
+```
+$ yo polymerts:el my-element [--path ] [--nodecorator]
 ```
 
 **Note: You must pass in an element name, and the name must contain a dash "-"**
@@ -35,15 +34,15 @@ yo polymerts:el my-element [--path ]
 
 ```
 --path, element output path. By default is 'app' and will put your element in folder 'app/elements'.
+--nodecorator, generate element without decorator. TS < 1.5 compatibility.
 ```
 
 ### Generate Typescript from Element
 Generates a Typescript definition (.d.ts) from an installed Polymer element present in `bower_components`.
 
 Example:
-```bash
-
-yo polymerts:gen polymer-element [--path ] [--elpath ]
+```
+$ yo polymerts:gen polymer-element [--path ] [--elpath ]
 ```
 
 **Note:**
