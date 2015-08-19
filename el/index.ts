@@ -151,18 +151,25 @@ var generator = yeoman.generators.Base.extend({
   
         var templateEl = (!yo.options.nodecorator) ? 'templates/_element.tst' : 'templates/_element-no-decorator.tst' ;
         
-        yo.template(path.join(__dirname, templateEl), pathToEl.concat('.ts'));
-        
+        try {
+
+            yo.template(path.join(__dirname, templateEl), pathToEl.concat('.ts'));
+            
+            if (yo.includeImport && yo.existsElementsFile()) {
+    
+                var elementsPath = path.join( yo.options.path,'elements/elements.html')
+                var file = yo.fs.read(elementsPath);
+                el = el.replace('\\', '/');
+                file += '<link rel="import" href="' + el + '.html">\n';
+                yo.fs.write(elementsPath, file);
+            }
+        }
+        catch( e ) {
+            yo.log( "error: " + e);
+        }
+                
     
         // Wire up the dependency in elements.html
-        if (yo.includeImport && yo.existsElementsFile()) {
-  
-            var elementsPath = path.join( yo.options.path,'elements/elements.html')
-            var file = yo.fs.read(elementsPath);
-            el = el.replace('\\', '/');
-            file += '<link rel="import" href="' + el + '.html">\n';
-            yo.fs.write(elementsPath, file);
-        }
 
       })(this);
 

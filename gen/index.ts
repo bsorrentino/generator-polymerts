@@ -91,7 +91,6 @@ module generator {
   
   export interface ThisGenerator extends yeoman.IYeomanGenerator {
     fs:IMemFsEditor;
-    
     // custom
 
     options:IOptions;
@@ -127,10 +126,10 @@ var generator = yeoman.generators.Base.extend({
         
       }
       yo.templateDesc = ( p:hydrolysis.Descriptor, tabs:string = '\t'):string => {  
-         
+        var desc = p.desc || ''; 
         var newline = new RegExp( '\\n', 'g');
         var comment = new RegExp( '\\*/', 'g');
-        return p.desc.replace(newline, '\n\t' + tabs ).replace( comment, '' );
+        return desc.replace(newline, '\n\t' + tabs ).replace( comment, '' );
       };
 
       yo.templateType = ( p:hydrolysis.PropertyDescriptor ):string => {
@@ -159,7 +158,6 @@ var generator = yeoman.generators.Base.extend({
     
       yo.parseBehavior  = (el:hydrolysis.BehaviorDescriptor) => {
 
-        
         var tk =  el.is.split('.');
 
         var module = ( tk.length == 1 ) ? "Polymer" : tk[0];
@@ -175,19 +173,24 @@ var generator = yeoman.generators.Base.extend({
           return ((value.function) && !(value.private))  ;
         });
 
-        yo.template( path.join(__dirname, 'templates/_behaviour.tst'), target, 
-              { element: el,
-                moduleName:module,
-                className:_s.classify(name),
-                props:publicProps,
-                methods:publicMethods,
-                templateParams:yo.templateParams,
-                templateType:yo.templateType,
-                templateDesc:yo.templateDesc
-              } 
-        );
-           
-        yo.unescapeFile(target);
+        try {
+            yo.template( path.join(__dirname, 'templates/_behaviour.tst'), target, 
+                { element: el,
+                    moduleName:module,
+                    className:_s.classify(name),
+                    props:publicProps,
+                    methods:publicMethods,
+                    templateParams:yo.templateParams,
+                    templateType:yo.templateType,
+                    templateDesc:yo.templateDesc
+                } 
+            );
+            
+            yo.unescapeFile(target);
+        }
+        catch( e ) {
+            yo.log( "error: " + e);
+        }
       }
       
       yo.parse  = (analyzer:hydrolysis.Analyzer) => {
@@ -202,13 +205,13 @@ var generator = yeoman.generators.Base.extend({
             analyzer.behaviors.forEach( (v, index, array ) => {   
                 if( !set[v.is] ) { // apply once
                   set[v.is] = v;
-                  yo.parseBehavior(v);
+                      yo.parseBehavior(v);                  
                 }
             });
                  
         }  
          
-        
+
         var publicProps = el.properties.filter( ( value, index, array ) => {
           return !((value.function) || (value.private))  ;
         });
@@ -221,20 +224,25 @@ var generator = yeoman.generators.Base.extend({
         
         var target = path.join( yo.options.path, el.is.concat(".d.ts"));
        
-        yo.template( path.join(__dirname, 'templates/_element.tst'), target , 
-              { element: el,
-                moduleName:module,
-                className:_s.classify(el.is),
-                props:publicProps,
-                methods:publicMethods,
-                templateParams:yo.templateParams,
-                templateType:yo.templateType,
-                templateDesc:yo.templateDesc
+        try  {
+            yo.template( path.join(__dirname, 'templates/_element.tst'), target , 
+                { element: el,
+                    moduleName:module,
+                    className:_s.classify(el.is),
+                    props:publicProps,
+                    methods:publicMethods,
+                    templateParams:yo.templateParams,
+                    templateType:yo.templateType,
+                    templateDesc:yo.templateDesc
+    
+                } 
+            );
+            yo.unescapeFile(target);        
+        }
+        catch( e ) {
+            yo.log( "error: " + e);
+        }
 
-              } 
-        );
-
-        yo.unescapeFile(target);
         
       }
 
