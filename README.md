@@ -25,7 +25,7 @@ Generates a polymer element in `app/elements` and optionally appends an import t
 
 Example:
 ```
-$ yo polymerts:el my-element [--path ] [--nodecorator]
+$ yo polymerts:el my-element [--path <output dir>] [--nodecorator]
 ```
 
 **Note: You must pass in an element name, and the name must contain a dash "-"**
@@ -42,7 +42,7 @@ Generates a Typescript definition (.d.ts) from an installed Polymer element pres
 
 Example:
 ```
-$ yo polymerts:gen polymer-element [--path ] [--elpath ]
+$ yo polymerts:gen polymer-element [--path <output dir>] [--elpath <source dir>]
 ```
 
 **Note:**
