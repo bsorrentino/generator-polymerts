@@ -21,9 +21,10 @@ var generator = yeoman.generators.Base.extend({
             };
             yo.templateDesc = function (p, tabs) {
                 if (tabs === void 0) { tabs = '\t'; }
+                var desc = p.desc || '';
                 var newline = new RegExp('\\n', 'g');
                 var comment = new RegExp('\\*/', 'g');
-                return p.desc.replace(newline, '\n\t' + tabs).replace(comment, '');
+                return desc.replace(newline, '\n\t' + tabs).replace(comment, '');
             };
             yo.templateType = function (p) {
                 switch (p.type) {
@@ -55,16 +56,21 @@ var generator = yeoman.generators.Base.extend({
                 var publicMethods = el.properties.filter(function (value, index, array) {
                     return ((value.function) && !(value.private));
                 });
-                yo.template(path.join(__dirname, 'templates/_behaviour.tst'), target, { element: el,
-                    moduleName: module,
-                    className: _s.classify(name),
-                    props: publicProps,
-                    methods: publicMethods,
-                    templateParams: yo.templateParams,
-                    templateType: yo.templateType,
-                    templateDesc: yo.templateDesc
-                });
-                yo.unescapeFile(target);
+                try {
+                    yo.template(path.join(__dirname, 'templates/_behaviour.tst'), target, { element: el,
+                        moduleName: module,
+                        className: _s.classify(name),
+                        props: publicProps,
+                        methods: publicMethods,
+                        templateParams: yo.templateParams,
+                        templateType: yo.templateType,
+                        templateDesc: yo.templateDesc
+                    });
+                    yo.unescapeFile(target);
+                }
+                catch (e) {
+                    yo.log("error: " + e);
+                }
             };
             yo.parse = function (analyzer) {
                 var el = analyzer.elementsByTagName[_this.elementName];
@@ -86,16 +92,21 @@ var generator = yeoman.generators.Base.extend({
                 });
                 var module = el.is.split('-')[0];
                 var target = path.join(yo.options.path, el.is.concat(".d.ts"));
-                yo.template(path.join(__dirname, 'templates/_element.tst'), target, { element: el,
-                    moduleName: module,
-                    className: _s.classify(el.is),
-                    props: publicProps,
-                    methods: publicMethods,
-                    templateParams: yo.templateParams,
-                    templateType: yo.templateType,
-                    templateDesc: yo.templateDesc
-                });
-                yo.unescapeFile(target);
+                try {
+                    yo.template(path.join(__dirname, 'templates/_element.tst'), target, { element: el,
+                        moduleName: module,
+                        className: _s.classify(el.is),
+                        props: publicProps,
+                        methods: publicMethods,
+                        templateParams: yo.templateParams,
+                        templateType: yo.templateType,
+                        templateDesc: yo.templateDesc
+                    });
+                    yo.unescapeFile(target);
+                }
+                catch (e) {
+                    yo.log("error: " + e);
+                }
             };
         })(this);
     },
