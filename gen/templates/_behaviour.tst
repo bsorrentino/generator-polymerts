@@ -4,7 +4,7 @@ declare module <%=moduleName%> {
 
 	/* <%= templateDesc(element) %>
 	*/
-	interface <%=className%> <% if( element.behaviors ) { %> extends <%=element.behaviors.join(',')%><% } %>
+	export interface <%=className%> <% if( element.behaviors ) { %> extends <%=element.behaviors.join(',')%><% } %>
 	{	
 	<% if( element.events && element.events.length>0 ) { %>/* 
 	== EVENTS ==
