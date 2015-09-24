@@ -7,6 +7,7 @@ var mkdirp = require("mkdirp");
 var path = require("path");
 var _s = require('underscore.string');
 var yeoman = require("yeoman-generator");
+
 var generator = yeoman.generators.Base.extend({
     constructor: function () {
         var _this = this;

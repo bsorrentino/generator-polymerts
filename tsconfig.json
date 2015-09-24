@@ -14,8 +14,5 @@
     "filesGlob": [
         "./**/*.ts",
         "!./node_modules/**/*.ts"
-    ],
-    "files":[
-       "element/index.ts" 
     ]
 }
