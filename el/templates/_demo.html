@@ -7,14 +7,10 @@ DEMO PAGE FOR COMPONENT '<%=elementName%>'
     <title>DEMO <%=elementName%></title>
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
     <script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
-    
+
     <link rel="import" href="<%=elementName%>.html">
 
     <style is="custom-style">
-      .horizontal-section {
-        min-width: 100px;
-      }
-
     </style>
 
   </head>
@@ -22,11 +18,16 @@ DEMO PAGE FOR COMPONENT '<%=elementName%>'
   <body unresolved>
 
   <x-app></x-app>
-      
+
   <dom-module id="x-app">
     <template>
+      <style>
+        .horizontal-section {
+          min-width: 100px;
+        }
+      </style>
       <div>
-        <h4>TEST</h4>
+        <h4>Demo: <%=elementName%></h4>
         <div class="horizontal-section">
           <<%=elementName%> id="myelement" greet="{{test}}" on=greet-event="handeGreet" ></<%=elementName%>>
         </div>
@@ -34,9 +35,9 @@ DEMO PAGE FOR COMPONENT '<%=elementName%>'
     </div>
   </template>
   </dom-module>
-  
-  
-  <script>     
+
+
+  <script>
   Polymer({
         is: 'x-app',
         properties: {
@@ -50,15 +51,15 @@ DEMO PAGE FOR COMPONENT '<%=elementName%>'
             console.log('handle gree event!', e);
         },
         ready: function() {
-          console.log("APP ready" );  
-          
+          console.log("APP ready" );
+
         }
-      });      
-  
+      });
+
         (function(document) {
           'use strict';
         })(document);
   </script>
-    
+
   </body>
 </html>
