@@ -12,71 +12,49 @@ import yeoman = require("yeoman-generator");
 
 type yo = yo.YeomanGeneratorBase;
 
-class Poc  {
-    
-    fullname : string;
-    
-    
-    constructor() {
-        yeoman.generators.Base.apply(this, arguments);    
-        console.log("Poc.constructor");    
-
-
-        ((yo:yo) => {
-
-            this.fullname = "POC";  
-      
-            yo.option("path",{desc:"element output path", defaults:"app"});
-                
-        })(<any>this);
-        
-    }
-    
-    initializing() {
-        console.log("Poc.initializing", this.fullname);    
-        this.fullname = "POC";
-    }
-    
-    prompting() {
-        console.log("Poc.prompting");    
-    }
-    
-    configuring() {
-        console.log("Poc.configuring");    
-    }
-    
-    poc() {
-        console.log("Poc.poc");    
-    }
-    
-    end() {
-        console.log("Poc.end");    
-    }
+function yo(p:Poc):yo {
+  return <any>p;
 }
-  
-var gen = yeoman.generators.Base.extend( Poc.prototype );
- 
-/*
-var gen = yeoman.generators.Base.extend({
-    
-  constructor: function () {
-     yeoman.generators.Base.apply(this, arguments);    
-     this.poc = new Poc();
-     console.log( "fullname", this.fullname );
-    
-  },
-  initializing: function() {
-  },
-  prompting: function () {
-  },
-  configuring: function() {
-  },
-  poc : function() {
-  },
-  end:function() {
+
+class Poc  {
+  fullname : string;
+
+  constructor() {
+      yeoman.generators.Base.apply(this, arguments);
+
+      console.log("Poc.constructor");
+      this.fullname = "POC";
+
+      yo(this).option("path",{desc:"element output path", defaults:"app"});
+
+
+  }
+  initializing() {
+    console.log("Poc.initializing", this.fullname);
+    this.fullname = "POC";
   }
 
-});
-*/
+  prompting() {
+      console.log("Generator.prompting");
+  }
+
+  configuring() {
+      console.log("Generator.configuring");
+  }
+  end() {
+      console.log("Generator.end");
+  }
+
+
+
+  poc() {
+      console.log("Poc.poc");
+  }
+
+
+
+}
+var gen = yeoman.generators.Base.extend( Poc.prototype );
+
 
 module.exports = gen;
