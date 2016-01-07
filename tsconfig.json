@@ -17,6 +17,7 @@
         "./el/index.ts",
         "./gen/index.ts",
         "./poc/index.ts",
+        "./test/app/elements/my-element/my-element.ts",
         "./test/typings/polymer/paper-item.d.ts",
         "./test/typings/polymer/PaperItemBehavior.d.ts",
         "./typings/cheerio/cheerio.d.ts",
