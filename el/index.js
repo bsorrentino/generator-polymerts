@@ -20,7 +20,7 @@ var GeneratorPolymerTS;
             }
         };
         El.prototype.prompting = function () {
-            if (!this.existsElementsFile())
+            if (!this._existsElementsFile())
                 return;
             var done = this.yo.async();
             var prompts = [
@@ -38,11 +38,10 @@ var GeneratorPolymerTS;
         };
         El.prototype.configuring = function () {
         };
-        El.prototype.element = function () {
-            console.log("writing");
+        El.prototype.execute = function () {
             var el = path.join(this.elementName, this.elementName);
             var pathToEl = path.join(this.options.path, "elements", el);
-            console.log("el", el, "pathToEl", pathToEl);
+            console.log("Generating Element", el, "pathToEl", pathToEl);
             this.pathToBower = path.relative(path.dirname(pathToEl), path.join(process.cwd(), this.options.path, 'bower_components'));
             this.yo.template(path.join(__dirname, 'templates/_element.html'), pathToEl.concat('.html'));
             this.yo.template(path.join(__dirname, 'templates/_demo.html'), path.join(this.options.path, "elements", this.elementName, "demo.html"));
@@ -50,7 +49,7 @@ var GeneratorPolymerTS;
             var templateEl = (!this.options.nodecorator) ? 'templates/_element.tst' : 'templates/_element-no-decorator.tst';
             try {
                 this.yo.template(path.join(__dirname, templateEl), pathToEl.concat('.ts'));
-                if (this.includeImport && this.existsElementsFile()) {
+                if (this.includeImport && this._existsElementsFile()) {
                     var elementsPath = path.join(this.options.path, 'elements/elements.html');
                     var file = this.fs.read(elementsPath);
                     el = el.replace('\\', '/');
@@ -64,7 +63,7 @@ var GeneratorPolymerTS;
         };
         El.prototype.end = function () {
         };
-        El.prototype.existsElementsFile = function () {
+        El.prototype._existsElementsFile = function () {
             return this.fs.exists('app/elements/elements.html');
         };
         return El;

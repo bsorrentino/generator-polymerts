@@ -67,7 +67,7 @@ module GeneratorPolymerTS {
     }
 
     prompting() {
-        if( !this.existsElementsFile() ) return;
+        if( !this._existsElementsFile() ) return;
 
         var done = this.yo.async();
 
@@ -91,8 +91,8 @@ module GeneratorPolymerTS {
     }
 
     // MAIN TASK
-    element () {
-          console.log( "writing" );
+    execute() {
+          //console.log( "El.execute" );
 
           // el = "x-foo/x-foo"
           var  el = path.join(this.elementName, this.elementName);
@@ -101,7 +101,7 @@ module GeneratorPolymerTS {
           var pathToEl = path.join(this.options.path, "elements", el);
 
 
-          console.log( "el", el, "pathToEl", pathToEl);
+          console.log( "Generating Element", el, "pathToEl", pathToEl);
 
           // Used by element template
           this.pathToBower = path.relative(
@@ -121,7 +121,7 @@ module GeneratorPolymerTS {
 
               this.yo.template(path.join(__dirname, templateEl), pathToEl.concat('.ts'));
 
-              if (this.includeImport && this.existsElementsFile()) {
+              if (this.includeImport && this._existsElementsFile()) {
 
                   var elementsPath = path.join( this.options.path,'elements/elements.html')
                   var file = this.fs.read(elementsPath);
@@ -139,7 +139,7 @@ module GeneratorPolymerTS {
       }
 
     // custom
-    existsElementsFile() {
+    private _existsElementsFile() {
       return  this.fs.exists('app/elements/elements.html');
     }
 
