@@ -1,150 +1,144 @@
-/// <reference path="../typings/yeoman-generator/yeoman-generator.d.ts"/>
-/// <reference path='../typings/underscore.string/underscore.string.d.ts' />
-///  <reference path='../typings/cheerio/cheerio.d.ts' />
-///  <reference path='../typings/mkdirp/mkdirp.d.ts' />
+"use strict";
 var hyd = require('hydrolysis');
 var mkdirp = require("mkdirp");
 var path = require("path");
 var _s = require('underscore.string');
 var yeoman = require("yeoman-generator");
-var generator = yeoman.generators.Base.extend({
-    constructor: function () {
-        var _this = this;
-        yeoman.generators.Base.apply(this, arguments);
-        (function (yo) {
-            yo.argument("elementName", { required: true, type: 'string', desc: "element name. Must contains dash symbol!" });
-            yo.option("elpath", { desc: "element source path" });
-            yo.option("path", { desc: "element output path", defaults: "typings/polymer" });
-            yo.unescapeFile = function (path) {
-                var content = yo.fs.read(path);
-                yo.fs.write(path, _s.unescapeHTML(content.toString()));
-            };
-            yo.templateDesc = function (p, tabs) {
-                if (tabs === void 0) { tabs = '\t'; }
-                var desc = p.desc || '';
-                var newline = new RegExp('\\n', 'g');
-                var comment = new RegExp('\\*/', 'g');
-                return desc.replace(newline, '\n\t' + tabs).replace(comment, '');
-            };
-            yo.templateType = function (p) {
-                switch (p.type) {
-                    case '*':
-                        return 'any';
-                    case 'Array':
-                        return 'Array<any>';
-                    case 'Object':
-                        return p.type;
-                    default:
-                        return p.type.toLowerCase();
-                }
-            };
-            yo.templateParams = function (params) {
-                if (!params)
-                    return "";
-                return params.map(function (value, index, array) {
-                    return value.name;
-                }).join(', ');
-            };
-            yo.parseBehavior = function (el) {
-                var tk = el.is.split('.');
-                var module = (tk.length == 1) ? "Polymer" : tk[0];
-                var name = (tk.length == 1) ? tk[0] : tk[1];
-                var target = path.join(yo.options.path, name.concat(".d.ts"));
-                var publicProps = el.properties.filter(function (value, index, array) {
-                    return !((value.function) || (value.private));
+var GeneratorPolymerTS;
+(function (GeneratorPolymerTS) {
+    var Gen = (function () {
+        function Gen() {
+            yeoman.generators.Base.apply(this, arguments);
+            this.yo = this;
+            this.yo.argument("elementName", { required: true, type: 'string', desc: "element name. Must contains dash symbol!" });
+            this.yo.option("elpath", { desc: "element source path" });
+            this.yo.option("path", { desc: "element output path", defaults: "typings/polymer" });
+        }
+        Gen.prototype.parse = function (analyzer) {
+            var _this = this;
+            var el = analyzer.elementsByTagName[this.elementName];
+            mkdirp.sync(this.options.path);
+            if (analyzer.behaviors) {
+                var set = {};
+                analyzer.behaviors.forEach(function (v, index, array) {
+                    if (!set[v.is]) {
+                        set[v.is] = v;
+                        _this.parseBehavior(v);
+                    }
                 });
-                var publicMethods = el.properties.filter(function (value, index, array) {
-                    return ((value.function) && !(value.private));
+            }
+            var publicProps = el.properties.filter(function (value, index, array) {
+                return !((value.function) || (value.private));
+            });
+            var publicMethods = el.properties.filter(function (value, index, array) {
+                return ((value.function) && !(value.private));
+            });
+            var module = el.is.split('-')[0];
+            var target = path.join(this.options.path, el.is.concat(".d.ts"));
+            try {
+                this.yo.template(path.join(__dirname, 'templates/_element.tst'), target, { element: el,
+                    moduleName: module,
+                    className: _s.classify(el.is),
+                    props: publicProps,
+                    methods: publicMethods,
+                    templateParams: this.templateParams,
+                    templateType: this.templateType,
+                    templateDesc: this.templateDesc
                 });
-                try {
-                    yo.template(path.join(__dirname, 'templates/_behaviour.tst'), target, { element: el,
-                        moduleName: module,
-                        className: _s.classify(name),
-                        props: publicProps,
-                        methods: publicMethods,
-                        templateParams: yo.templateParams,
-                        templateType: yo.templateType,
-                        templateDesc: yo.templateDesc
-                    });
-                    yo.unescapeFile(target);
-                }
-                catch (e) {
-                    yo.log("error: " + e);
-                }
-            };
-            yo.parse = function (analyzer) {
-                var el = analyzer.elementsByTagName[_this.elementName];
-                mkdirp.sync(yo.options.path);
-                if (analyzer.behaviors) {
-                    var set = {};
-                    analyzer.behaviors.forEach(function (v, index, array) {
-                        if (!set[v.is]) {
-                            set[v.is] = v;
-                            yo.parseBehavior(v);
-                        }
-                    });
-                }
-                var publicProps = el.properties.filter(function (value, index, array) {
-                    return !((value.function) || (value.private));
+                this.unescapeFile(target);
+            }
+            catch (e) {
+                this.yo.log("error: " + e);
+            }
+        };
+        Gen.prototype.parseBehavior = function (el) {
+            var tk = el.is.split('.');
+            var module = (tk.length == 1) ? "Polymer" : tk[0];
+            var name = (tk.length == 1) ? tk[0] : tk[1];
+            var target = path.join(this.options.path, name.concat(".d.ts"));
+            var publicProps = el.properties.filter(function (value, index, array) {
+                return !((value.function) || (value.private));
+            });
+            var publicMethods = el.properties.filter(function (value, index, array) {
+                return ((value.function) && !(value.private));
+            });
+            try {
+                this.yo.template(path.join(__dirname, 'templates/_behaviour.tst'), target, { element: el,
+                    moduleName: module,
+                    className: _s.classify(name),
+                    props: publicProps,
+                    methods: publicMethods,
+                    templateParams: this.templateParams,
+                    templateType: this.templateType,
+                    templateDesc: this.templateDesc
                 });
-                var publicMethods = el.properties.filter(function (value, index, array) {
-                    return ((value.function) && !(value.private));
-                });
-                var module = el.is.split('-')[0];
-                var target = path.join(yo.options.path, el.is.concat(".d.ts"));
-                try {
-                    yo.template(path.join(__dirname, 'templates/_element.tst'), target, { element: el,
-                        moduleName: module,
-                        className: _s.classify(el.is),
-                        props: publicProps,
-                        methods: publicMethods,
-                        templateParams: yo.templateParams,
-                        templateType: yo.templateType,
-                        templateDesc: yo.templateDesc
-                    });
-                    yo.unescapeFile(target);
-                }
-                catch (e) {
-                    yo.log("error: " + e);
-                }
-            };
-        })(this);
-    },
-    initializing: function () {
-        (function (yo) {
-            if (yo.elementName.indexOf('-') === -1) {
-                yo.emit('error', new Error('Element name must contain a dash "-"\n' +
+                this.unescapeFile(target);
+            }
+            catch (e) {
+                this.yo.log("error: " + e);
+            }
+        };
+        Gen.prototype.templateParams = function (params) {
+            if (!params)
+                return "";
+            return params.map(function (value, index, array) {
+                return value.name;
+            }).join(', ');
+        };
+        Gen.prototype.templateType = function (p) {
+            switch (p.type) {
+                case '*':
+                    return 'any';
+                case 'Array':
+                    return 'Array<any>';
+                case 'Object':
+                    return p.type;
+                default:
+                    return p.type.toLowerCase();
+            }
+        };
+        Gen.prototype.templateDesc = function (p, tabs) {
+            if (tabs === void 0) { tabs = '\t'; }
+            var desc = p.desc || '';
+            var newline = new RegExp('\\n', 'g');
+            var comment = new RegExp('\\*/', 'g');
+            return desc.replace(newline, '\n\t' + tabs).replace(comment, '');
+        };
+        Gen.prototype.unescapeFile = function (path) {
+            var content = this.fs.read(path);
+            this.fs.write(path, _s.unescapeHTML(content.toString()));
+        };
+        Gen.prototype.initializing = function () {
+            if (this.elementName.indexOf('-') === -1) {
+                this.yo.emit('error', new Error('Element name must contain a dash "-"\n' +
                     'ex: yo polymer:el my-element'));
             }
-        })(this);
-    },
-    prompting: function () {
-        (function (yo) {
-        })(this);
-    },
-    configuring: function () {
-        (function (yo) {
-        })(this);
-    },
-    gen: function () {
-        var _this = this;
-        (function (yo) {
+        };
+        Gen.prototype.configuring = function () {
+        };
+        Gen.prototype.prompting = function () {
+        };
+        Gen.prototype.execute = function () {
+            var _this = this;
             var pathBower = path.join(process.cwd(), 'bower_components');
-            var el = (yo.options.elpath) ?
-                path.join(yo.options.elpath, _this.elementName) :
-                path.join(_this.elementName, _this.elementName);
+            var el = (this.options.elpath) ?
+                path.join(this.options.elpath, this.elementName) :
+                path.join(this.elementName, this.elementName);
             var pathToEl = path.join(pathBower, el);
             var elementHtml = pathToEl.concat('.html');
-            console.log("generating typescript for element", _this.elementName, elementHtml);
+            this.log("generating typescript for element", this.elementName, elementHtml);
             hyd.Analyzer.analyze(elementHtml)
                 .then(function (analyzer) {
-                yo.parse(analyzer);
+                console.log("analyzer", analyzer);
+                _this.parse(analyzer);
             });
-        })(this);
-    },
-    end: function () {
-        (function (yo) {
-        })(this);
-    }
-});
-module.exports = generator;
+        };
+        Gen.prototype.end = function () {
+        };
+        return Gen;
+    }());
+    GeneratorPolymerTS.Gen = Gen;
+})(GeneratorPolymerTS || (GeneratorPolymerTS = {}));
+var gen = yeoman.generators.Base.extend(GeneratorPolymerTS.Gen.prototype);
+module.exports = gen;
+//# sourceMappingURL=index.js.map

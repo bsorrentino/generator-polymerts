@@ -11,7 +11,8 @@
   "repository": "bsorrentino/generator-polymerts",
   "files": [
     "el",
-    "gen"
+    "gen",
+    "poc"
   ],
   "author": "bsorrentino",
   "license": "MIT",
