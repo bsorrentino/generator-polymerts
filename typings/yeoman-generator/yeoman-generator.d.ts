@@ -7,7 +7,7 @@
 declare module yo {
 
   export interface IYeomanGenerator {
-    
+
     argument(name: string, config: IArgumentConfig): void;
     composeWith(namespace: string, options: any, settings?: IComposeSetting): IYeomanGenerator;
     defaultFor(name: string): void;
@@ -29,9 +29,9 @@ declare module yo {
     templatePath( ...path:string[] ):string;
 
     template( src:string, dest:string, context?:Object );
-    readFileAsString(path:string):string;  
+    readFileAsString(path:string):string;
     writeFileFromString( content:string, path:string);
-    
+
     log( param:any );
 
 
@@ -61,13 +61,13 @@ declare module yo {
 		listeners(event: string): Function[];
 		emit(event: string, ...args: any[]): boolean;
 
-        prompt( prompts:Array<IPromptConfig>, cb:(answer:any) => void );
-        async(): Function;
-        templatePath( ...path:string[] ):string;
-        template( src:string, dest:string );
-        readFileAsString(path:string):string;  
-        writeFileFromString( content:string, path:string);
-        log( param:any );
+    prompt( prompts:Array<IPromptConfig>, cb:(answer:any) => void );
+    async(): Function;
+    templatePath( ...path:string[] ):string;
+    template( src:string, dest:string, context?:Object );
+    readFileAsString(path:string):string;
+    writeFileFromString( content:string, path:string);
+    log( param:any );
 
 	}
 
@@ -211,8 +211,7 @@ when: (Function, Boolean) Receive the current user answers hash and should retur
 		  static extend(protoProps: IQueueProps, staticProps?: any): IYeomanGenerator;
 	  }
 
-	  }
-  }
+	}
 }
 
 declare module "yeoman-generator" {

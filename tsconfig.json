@@ -1,5 +1,5 @@
 {
-    "version":"1.5.3",
+    "version": "1.5.3",
     "compilerOptions": {
         "target": "es5",
         "module": "commonjs",
@@ -7,15 +7,29 @@
         "noImplicitAny": false,
         "removeComments": true,
         "noLib": false,
-        "sourceMap":true
-        
-        
+        "sourceMap": true
     },
     "filesGlob": [
         "./**/*.ts",
         "!./node_modules/**/*.ts"
     ],
-    "files":[
-       "element/index.ts" 
-    ]
+    "files": [
+        "./el/index.ts",
+        "./gen/index.ts",
+        "./poc/index.ts",
+        "./test/app/elements/my-element/my-element.ts",
+        "./test/typings/polymer/paper-item.d.ts",
+        "./test/typings/polymer/PaperItemBehavior.d.ts",
+        "./typings/cheerio/cheerio.d.ts",
+        "./typings/lodash/lodash.d.ts",
+        "./typings/mkdirp/mkdirp.d.ts",
+        "./typings/node/node.d.ts",
+        "./typings/tsd.d.ts",
+        "./typings/underscore.string/underscore.string.d.ts",
+        "./typings/underscore/underscore.d.ts",
+        "./typings/yeoman-generator/yeoman-generator.d.ts"
+    ],
+    "atom": {
+        "rewriteTsconfig": true
+    }
 }
