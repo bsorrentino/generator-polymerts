@@ -90,6 +90,7 @@ module GeneratorPolymerTS {
     configuring() {
     }
 
+    // MAIN TASK
     element () {
           console.log( "writing" );
 
