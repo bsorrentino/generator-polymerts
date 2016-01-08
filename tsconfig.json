@@ -11,16 +11,13 @@
     },
     "filesGlob": [
         "./**/*.ts",
-        "!./node_modules/**/*.ts"
+        "!./node_modules/**/*.ts",
+        "!./test/**/*.ts"
     ],
     "files": [
         "./el/index.ts",
         "./gen/index.ts",
         "./poc/index.ts",
-        "./test/app/elements/my-element/my-element.ts",
-        "./test/app/elements/my-test/my-test.ts",
-        "./test/typings/polymer/paper-item.d.ts",
-        "./test/typings/polymer/PaperItemBehavior.d.ts",
         "./typings/cheerio/cheerio.d.ts",
         "./typings/lodash/lodash.d.ts",
         "./typings/mkdirp/mkdirp.d.ts",
