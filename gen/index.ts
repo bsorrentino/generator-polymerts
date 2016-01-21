@@ -199,15 +199,16 @@ module GeneratorPolymerTS {
 
     }
     private _templateType( p:hydrolysis.PropertyDescriptor ):string {
+      if (!p.type) return;
       switch(p.type){
         case'*':
-          return 'any';
+          return ': any';
         case 'Array':
-          return 'Array<any>'
+          return ': Array<any>'
         case 'Object':
-          return p.type;
+          return ': ' + p.type;
         default:
-          return p.type.toLowerCase();
+          return ': ' + p.type.toLowerCase();
       }
 
     }
