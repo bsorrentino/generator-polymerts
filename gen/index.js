@@ -3,6 +3,20 @@ var mkdirp = require("mkdirp");
 var path = require("path");
 var _s = require('underscore.string');
 var yeoman = require("yeoman-generator");
+function __templateType(p) {
+    if (!p.type)
+        return;
+    switch (p.type) {
+        case '*':
+            return ': any';
+        case 'Array':
+            return ': Array<any>';
+        case 'Object':
+            return ': ' + p.type;
+        default:
+            return (': ' + p.type.toLowerCase()).replace(/^: \?/, '?: ');
+    }
+}
 var GeneratorPolymerTS;
 (function (GeneratorPolymerTS) {
     var Gen = (function () {
@@ -15,11 +29,8 @@ var GeneratorPolymerTS;
         }
         Gen.prototype._parseElement = function (analyzer) {
             var _this = this;
-            var el = analyzer.elementsByTagName[this.elementName];
             mkdirp.sync(this.options.path);
-            if (el.behaviors && el.behaviors.length == 0) {
-                el.behaviors = null;
-            }
+
             if (analyzer.behaviors) {
                 var set = {};
                 analyzer.behaviors.forEach(function (v, index, array) {
@@ -29,28 +40,36 @@ var GeneratorPolymerTS;
                     }
                 });
             }
-            var publicProps = el.properties.filter(function (value, index, array) {
-                return !((value.function) || (value.private));
-            });
-            var publicMethods = el.properties.filter(function (value, index, array) {
-                return ((value.function) && !(value.private));
-            });
-            var module = el.is.split('-')[0];
-            var target = path.join(this.options.path, el.is.concat(".d.ts"));
-            try {
-                this.yo.template(path.join(__dirname, 'templates/_element.tst'), target, { element: el,
-                    moduleName: module,
-                    className: _s.classify(el.is),
-                    props: publicProps,
-                    methods: publicMethods,
-                    templateParams: this._templateParams,
-                    templateType: this._templateType,
-                    templateDesc: this._templateDesc
+
+            var el = analyzer.elementsByTagName[this.elementName];
+            if (el) {
+                if (el.behaviors && el.behaviors.length == 0) {
+                    el.behaviors = null;
+                }
+                var publicProps = el.properties.filter(function (value, index, array) {
+                    return !((value.function) || (value.private));
                 });
-                this._unescapeFile(target);
-            }
-            catch (e) {
-                this.yo.log("error: " + e);
+                var publicMethods = el.properties.filter(function (value, index, array) {
+                    return ((value.function) && !(value.private));
+                });
+                var module = el.is.split('-')[0];
+                var target = path.join(this.options.path, el.is.concat(".d.ts"));
+                try {
+                    this.yo.template(path.join(__dirname, 'templates/_element.tst'), target, { element: el,
+                        moduleName: module,
+                        className: _s.classify(el.is),
+                        props: publicProps,
+                        methods: publicMethods,
+                        templateParams: this._templateParams,
+                        templateType: this._templateType,
+                        templateDesc: this._templateDesc,
+                        templateReferencePath: this._templateReferencePath
+                    });
+                    this._unescapeFile(target);
+                }
+                catch (e) {
+                    this.yo.log("error: " + e);
+                }
             }
         };
         Gen.prototype._parseBehavior = function (el) {
@@ -72,7 +91,8 @@ var GeneratorPolymerTS;
                     methods: publicMethods,
                     templateParams: this._templateParams,
                     templateType: this._templateType,
-                    templateDesc: this._templateDesc
+                    templateDesc: this._templateDesc,
+                    templateReferencePath: this._templateReferencePath
                 });
                 this._unescapeFile(target);
             }
@@ -84,22 +104,11 @@ var GeneratorPolymerTS;
             if (!params)
                 return "";
             return params.map(function (value, index, array) {
-                return value.type ? (value.name + ': ' + value.type) : value.name;
+                return value.type ? (value.name + __templateType(value)) : value.name;
             }).join(', ');
         };
         Gen.prototype._templateType = function (p) {
-            if (!p.type)
-                return;
-            switch (p.type) {
-                case '*':
-                    return ': any';
-                case 'Array':
-                    return ': Array<any>';
-                case 'Object':
-                    return ': ' + p.type;
-                default:
-                    return ': ' + p.type.toLowerCase();
-            }
+            return __templateType(p);
         };
         Gen.prototype._templateDesc = function (p, tabs) {
             if (tabs === void 0) { tabs = '\t'; }
@@ -111,6 +120,13 @@ var GeneratorPolymerTS;
         Gen.prototype._unescapeFile = function (path) {
             var content = this.fs.read(path);
             this.fs.write(path, _s.unescapeHTML(content.toString()));
+        };
+        Gen.prototype._templateReferencePath = function (behavior) {
+            behavior = behavior.match(/^(?:Polymer\.)?(.*)/)[1];
+            if (!behavior.match('^' + this['moduleName'])) {
+                behavior = '../' + behavior.replace(/^([A-Z][a-z]+).*/, '$1-elements').toLowerCase() + '/' + behavior;
+            }
+            return "/// <reference path=\"" + behavior + ".d.ts\"/>";
         };
         Gen.prototype.initializing = function () {
             if (this.elementName.indexOf('-') === -1) {

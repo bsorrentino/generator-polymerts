@@ -13,9 +13,21 @@ import _s = require('underscore.string');
 
 import yeoman = require("yeoman-generator");
 
+function __templateType(p: hydrolysis.PropertyDescriptor): string {
+  if (!p.type) return;
+  switch (p.type) {
+  case '*':
+    return ': any';
+  case 'Array':
+    return ': Array<any>'
+  case 'Object':
+    return ': ' + p.type;
+  default:
+    return (': ' + p.type.toLowerCase()).replace(/^: \?/, '?: ');
+  }
+}
 
 module hydrolysis {
-
   export interface Descriptor {
     desc:string;
   }
@@ -101,14 +113,8 @@ module GeneratorPolymerTS {
     yo:yo; // this reference as yo.YeomanGeneratorBase
 
     private _parseElement( analyzer:hydrolysis.Analyzer ) {
-
-      var el = analyzer.elementsByTagName[this.elementName];
-
       mkdirp.sync( this.options.path );
 
-      if( el.behaviors && el.behaviors.length == 0 ) {
-          el.behaviors = null;
-      }
       if( analyzer.behaviors ) {
           var set = {};
 
@@ -118,41 +124,45 @@ module GeneratorPolymerTS {
                 this._parseBehavior(v);
               }
           });
-
       }
 
-      var publicProps = el.properties.filter( ( value, index, array ) => {
-        return !((value.function) || (value.private))  ;
-      });
+      var el = analyzer.elementsByTagName[this.elementName];
+      if( el ) {
+        if (el.behaviors && el.behaviors.length == 0) {
+          el.behaviors = null;
+        }
 
-      var publicMethods = el.properties.filter( ( value, index, array ) => {
-        return ((value.function) && !(value.private))  ;
-      });
+        var publicProps = el.properties.filter( ( value, index, array ) => {
+          return !((value.function) || (value.private))  ;
+        });
 
-      var module = el.is.split('-')[0];
+        var publicMethods = el.properties.filter( ( value, index, array ) => {
+          return ((value.function) && !(value.private))  ;
+        });
 
-      var target = path.join( this.options.path, el.is.concat(".d.ts"));
+        var module = el.is.split('-')[0];
 
-      try  {
-          this.yo.template( path.join(__dirname, 'templates/_element.tst'), target ,
-              { element: el,
-                  moduleName:module,
-                  className:_s.classify(el.is),
-                  props:publicProps,
-                  methods:publicMethods,
-                  templateParams:this._templateParams,
-                  templateType:this._templateType,
-                  templateDesc:this._templateDesc
+        var target = path.join( this.options.path, el.is.concat(".d.ts"));
 
-              }
-          );
-          this._unescapeFile(target);
+        try  {
+            this.yo.template( path.join(__dirname, 'templates/_element.tst'), target ,
+                { element: el,
+                    moduleName:module,
+                    className:_s.classify(el.is),
+                    props:publicProps,
+                    methods:publicMethods,
+                    templateParams:this._templateParams,
+                    templateType:this._templateType,
+                    templateDesc:this._templateDesc,
+                    templateReferencePath: this._templateReferencePath
+                }
+            );
+            this._unescapeFile(target);
+        }
+        catch( e ) {
+            this.yo.log( "error: " + e);
+        }
       }
-      catch( e ) {
-          this.yo.log( "error: " + e);
-      }
-
-
     }
     private _parseBehavior( el:hydrolysis.BehaviorDescriptor ) {
       var tk =  el.is.split('.');
@@ -179,7 +189,8 @@ module GeneratorPolymerTS {
                   methods:publicMethods,
                   templateParams:this._templateParams,
                   templateType:this._templateType,
-                  templateDesc:this._templateDesc
+                  templateDesc:this._templateDesc,
+                  templateReferencePath:this._templateReferencePath
               }
           );
 
@@ -194,23 +205,12 @@ module GeneratorPolymerTS {
       if( !params ) return "";
 
       return params.map<string>((value, index, array: Object[]) => {
-        return value.type ? (value.name + ': ' + value.type) : value.name;
+        return value.type ? (value.name + __templateType(value)) : value.name;
       }).join(', ');
 
     }
     private _templateType( p:hydrolysis.PropertyDescriptor ):string {
-      if (!p.type) return;
-      switch(p.type){
-        case'*':
-          return ': any';
-        case 'Array':
-          return ': Array<any>'
-        case 'Object':
-          return ': ' + p.type;
-        default:
-          return ': ' + p.type.toLowerCase();
-      }
-
+      return __templateType(p);
     }
     private _templateDesc( p:hydrolysis.Descriptor, tabs:string = '\t' ):string{
       var desc = p.desc || '';
@@ -223,6 +223,14 @@ module GeneratorPolymerTS {
       var content = this.fs.read(path);
       this.fs.write( path, _s.unescapeHTML(content.toString()) );
 
+    }
+    private _templateReferencePath(behavior: string):string {
+      behavior = behavior.match(/^(?:Polymer\.)?(.*)/)[1];
+
+      if (!behavior.match('^' + this['moduleName'])) {
+        behavior = '../' + behavior.replace(/^([A-Z][a-z]+).*/, '$1-elements').toLowerCase() + '/' + behavior;
+      }
+      return `/// <reference path="${behavior}.d.ts"/>`;
     }
 
     constructor() {

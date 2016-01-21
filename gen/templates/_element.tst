@@ -1,5 +1,6 @@
-
-
+<% if( element.behaviors ) { element.behaviors.forEach(function(b) { %>
+<%=templateReferencePath(b)%>
+<% });} %>
 declare module <%=moduleName%> {
 
 	/* <%=templateDesc(element) %>
