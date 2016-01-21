@@ -17,6 +17,9 @@ var GeneratorPolymerTS;
             var _this = this;
             var el = analyzer.elementsByTagName[this.elementName];
             mkdirp.sync(this.options.path);
+            if (el.behaviors && el.behaviors.length == 0) {
+                el.behaviors = null;
+            }
             if (analyzer.behaviors) {
                 var set = {};
                 analyzer.behaviors.forEach(function (v, index, array) {
@@ -81,7 +84,7 @@ var GeneratorPolymerTS;
             if (!params)
                 return "";
             return params.map(function (value, index, array) {
-                return value.name;
+                return value.type ? (value.name + ': ' + value.type) : value.name;
             }).join(', ');
         };
         Gen.prototype._templateType = function (p) {

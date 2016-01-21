@@ -106,6 +106,9 @@ module GeneratorPolymerTS {
 
       mkdirp.sync( this.options.path );
 
+      if( el.behaviors && el.behaviors.length == 0 ) {
+          el.behaviors = null;
+      }
       if( analyzer.behaviors ) {
           var set = {};
 
@@ -190,8 +193,8 @@ module GeneratorPolymerTS {
     private _templateParams( params:Array<Object> ):string {
       if( !params ) return "";
 
-      return params.map<string>( ( value, index, array:Object[]) => {
-        return value.name ;
+      return params.map<string>((value, index, array: Object[]) => {
+        return value.type ? (value.name + ': ' + value.type) : value.name;
       }).join(', ');
 
     }
