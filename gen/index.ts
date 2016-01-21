@@ -18,7 +18,6 @@ module hydrolysis {
 
   export interface Descriptor {
     desc:string;
-
   }
   export interface EventDescriptor extends Descriptor {
        jsdoc:Array<Object>;

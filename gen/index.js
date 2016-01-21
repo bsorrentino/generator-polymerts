@@ -1,4 +1,3 @@
-"use strict";
 var hyd = require('hydrolysis');
 var mkdirp = require("mkdirp");
 var path = require("path");
@@ -14,7 +13,7 @@ var GeneratorPolymerTS;
             this.yo.option("elpath", { desc: "element source path" });
             this.yo.option("path", { desc: "element output path", defaults: "typings/polymer" });
         }
-        Gen.prototype.parse = function (analyzer) {
+        Gen.prototype._parseElement = function (analyzer) {
             var _this = this;
             var el = analyzer.elementsByTagName[this.elementName];
             mkdirp.sync(this.options.path);
@@ -23,7 +22,7 @@ var GeneratorPolymerTS;
                 analyzer.behaviors.forEach(function (v, index, array) {
                     if (!set[v.is]) {
                         set[v.is] = v;
-                        _this.parseBehavior(v);
+                        _this._parseBehavior(v);
                     }
                 });
             }
@@ -41,17 +40,17 @@ var GeneratorPolymerTS;
                     className: _s.classify(el.is),
                     props: publicProps,
                     methods: publicMethods,
-                    templateParams: this.templateParams,
-                    templateType: this.templateType,
-                    templateDesc: this.templateDesc
+                    templateParams: this._templateParams,
+                    templateType: this._templateType,
+                    templateDesc: this._templateDesc
                 });
-                this.unescapeFile(target);
+                this._unescapeFile(target);
             }
             catch (e) {
                 this.yo.log("error: " + e);
             }
         };
-        Gen.prototype.parseBehavior = function (el) {
+        Gen.prototype._parseBehavior = function (el) {
             var tk = el.is.split('.');
             var module = (tk.length == 1) ? "Polymer" : tk[0];
             var name = (tk.length == 1) ? tk[0] : tk[1];
@@ -68,24 +67,24 @@ var GeneratorPolymerTS;
                     className: _s.classify(name),
                     props: publicProps,
                     methods: publicMethods,
-                    templateParams: this.templateParams,
-                    templateType: this.templateType,
-                    templateDesc: this.templateDesc
+                    templateParams: this._templateParams,
+                    templateType: this._templateType,
+                    templateDesc: this._templateDesc
                 });
-                this.unescapeFile(target);
+                this._unescapeFile(target);
             }
             catch (e) {
-                this.yo.log("error: " + e);
+                console.log("error: ", e);
             }
         };
-        Gen.prototype.templateParams = function (params) {
+        Gen.prototype._templateParams = function (params) {
             if (!params)
                 return "";
             return params.map(function (value, index, array) {
                 return value.name;
             }).join(', ');
         };
-        Gen.prototype.templateType = function (p) {
+        Gen.prototype._templateType = function (p) {
             switch (p.type) {
                 case '*':
                     return 'any';
@@ -97,14 +96,14 @@ var GeneratorPolymerTS;
                     return p.type.toLowerCase();
             }
         };
-        Gen.prototype.templateDesc = function (p, tabs) {
+        Gen.prototype._templateDesc = function (p, tabs) {
             if (tabs === void 0) { tabs = '\t'; }
             var desc = p.desc || '';
             var newline = new RegExp('\\n', 'g');
             var comment = new RegExp('\\*/', 'g');
             return desc.replace(newline, '\n\t' + tabs).replace(comment, '');
         };
-        Gen.prototype.unescapeFile = function (path) {
+        Gen.prototype._unescapeFile = function (path) {
             var content = this.fs.read(path);
             this.fs.write(path, _s.unescapeHTML(content.toString()));
         };
@@ -126,17 +125,16 @@ var GeneratorPolymerTS;
                 path.join(this.elementName, this.elementName);
             var pathToEl = path.join(pathBower, el);
             var elementHtml = pathToEl.concat('.html');
-            this.log("generating typescript for element", this.elementName, elementHtml);
+            console.log("generating typescript for element", this.elementName, elementHtml);
             hyd.Analyzer.analyze(elementHtml)
                 .then(function (analyzer) {
-                console.log("analyzer", analyzer);
-                _this.parse(analyzer);
+                _this._parseElement(analyzer);
             });
         };
         Gen.prototype.end = function () {
         };
         return Gen;
-    }());
+    })();
     GeneratorPolymerTS.Gen = Gen;
 })(GeneratorPolymerTS || (GeneratorPolymerTS = {}));
 var gen = yeoman.generators.Base.extend(GeneratorPolymerTS.Gen.prototype);
