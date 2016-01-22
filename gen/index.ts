@@ -13,20 +13,6 @@ import _s = require('underscore.string');
 
 import yeoman = require("yeoman-generator");
 
-function __templateType(p: hydrolysis.PropertyDescriptor): string {
-  if (!p.type) return;
-  switch (p.type) {
-  case '*':
-    return ': any';
-  case 'Array':
-    return ': Array<any>'
-  case 'Object':
-    return ': ' + p.type;
-  default:
-    return (': ' + p.type.toLowerCase()).replace(/^: \?/, '?: ');
-  }
-}
-
 module hydrolysis {
   export interface Descriptor {
     desc:string;
@@ -201,17 +187,36 @@ module GeneratorPolymerTS {
       }
 
     }
+
+    private static __templateType( p:hydrolysis.PropertyDescriptor ):string {
+
+      if (!p.type) return "";
+
+      switch (p.type) {
+      case '*':
+        return ': any';
+      case 'Array':
+        return ': Array<any>';
+      case 'Object':
+        return ': ' + p.type;
+      default:
+        return (': ' + p.type.toLowerCase()).replace(/^: \?/, '?: ');
+      }
+    }
+
+    private _templateType( p:hydrolysis.PropertyDescriptor ):string {
+      return Gen.__templateType(p);
+    }
+
     private _templateParams( params:Array<Object> ):string {
       if( !params ) return "";
 
       return params.map<string>((value, index, array: Object[]) => {
-        return value.type ? (value.name + __templateType(value)) : value.name;
+        return value.type ? (value.name + Gen.__templateType(value)) : value.name;
       }).join(', ');
 
     }
-    private _templateType( p:hydrolysis.PropertyDescriptor ):string {
-      return __templateType(p);
-    }
+
     private _templateDesc( p:hydrolysis.Descriptor, tabs:string = '\t' ):string{
       var desc = p.desc || '';
       var newline = new RegExp( '\\n', 'g');

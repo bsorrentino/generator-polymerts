@@ -1,3 +1,4 @@
+"use strict";
 var yeoman = require("yeoman-generator");
 function yo(p) {
     return p;
@@ -26,7 +27,7 @@ var Poc = (function () {
         console.log("Poc.poc");
     };
     return Poc;
-})();
+}());
 var gen = yeoman.generators.Base.extend(Poc.prototype);
 module.exports = gen;
 //# sourceMappingURL=index.js.map

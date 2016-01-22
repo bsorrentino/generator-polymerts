@@ -1,22 +1,9 @@
+"use strict";
 var hyd = require('hydrolysis');
 var mkdirp = require("mkdirp");
 var path = require("path");
 var _s = require('underscore.string');
 var yeoman = require("yeoman-generator");
-function __templateType(p) {
-    if (!p.type)
-        return;
-    switch (p.type) {
-        case '*':
-            return ': any';
-        case 'Array':
-            return ': Array<any>';
-        case 'Object':
-            return ': ' + p.type;
-        default:
-            return (': ' + p.type.toLowerCase()).replace(/^: \?/, '?: ');
-    }
-}
 var GeneratorPolymerTS;
 (function (GeneratorPolymerTS) {
     var Gen = (function () {
@@ -30,7 +17,6 @@ var GeneratorPolymerTS;
         Gen.prototype._parseElement = function (analyzer) {
             var _this = this;
             mkdirp.sync(this.options.path);
-
             if (analyzer.behaviors) {
                 var set = {};
                 analyzer.behaviors.forEach(function (v, index, array) {
@@ -40,7 +26,6 @@ var GeneratorPolymerTS;
                     }
                 });
             }
-
             var el = analyzer.elementsByTagName[this.elementName];
             if (el) {
                 if (el.behaviors && el.behaviors.length == 0) {
@@ -100,15 +85,29 @@ var GeneratorPolymerTS;
                 console.log("error: ", e);
             }
         };
+        Gen.__templateType = function (p) {
+            if (!p.type)
+                return "";
+            switch (p.type) {
+                case '*':
+                    return ': any';
+                case 'Array':
+                    return ': Array<any>';
+                case 'Object':
+                    return ': ' + p.type;
+                default:
+                    return (': ' + p.type.toLowerCase()).replace(/^: \?/, '?: ');
+            }
+        };
+        Gen.prototype._templateType = function (p) {
+            return Gen.__templateType(p);
+        };
         Gen.prototype._templateParams = function (params) {
             if (!params)
                 return "";
             return params.map(function (value, index, array) {
-                return value.type ? (value.name + __templateType(value)) : value.name;
+                return value.type ? (value.name + Gen.__templateType(value)) : value.name;
             }).join(', ');
-        };
-        Gen.prototype._templateType = function (p) {
-            return __templateType(p);
         };
         Gen.prototype._templateDesc = function (p, tabs) {
             if (tabs === void 0) { tabs = '\t'; }
@@ -155,7 +154,7 @@ var GeneratorPolymerTS;
         Gen.prototype.end = function () {
         };
         return Gen;
-    })();
+    }());
     GeneratorPolymerTS.Gen = Gen;
 })(GeneratorPolymerTS || (GeneratorPolymerTS = {}));
 var gen = yeoman.generators.Base.extend(GeneratorPolymerTS.Gen.prototype);
