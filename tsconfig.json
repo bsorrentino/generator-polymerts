@@ -19,7 +19,6 @@
         "./gen/index.ts",
         "./poc/index.ts",
         "./typings/cheerio/cheerio.d.ts",
-        "./typings/lodash/lodash.d.ts",
         "./typings/mkdirp/mkdirp.d.ts",
         "./typings/node/node.d.ts",
         "./typings/tsd.d.ts",

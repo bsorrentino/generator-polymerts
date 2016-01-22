@@ -1,4 +1,3 @@
-"use strict";
 var path = require("path");
 var _s = require('underscore.string');
 var yeoman = require("yeoman-generator");
@@ -67,7 +66,7 @@ var GeneratorPolymerTS;
             return this.fs.exists('app/elements/elements.html');
         };
         return El;
-    }());
+    })();
     GeneratorPolymerTS.El = El;
 })(GeneratorPolymerTS || (GeneratorPolymerTS = {}));
 var generator = yeoman.generators.Base.extend(GeneratorPolymerTS.El.prototype);
