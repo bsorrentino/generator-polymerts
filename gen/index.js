@@ -1,4 +1,3 @@
-"use strict";
 var hyd = require('hydrolysis');
 var mkdirp = require("mkdirp");
 var path = require("path");
@@ -87,17 +86,28 @@ var GeneratorPolymerTS;
         };
         Gen.__templateType = function (p) {
             if (!p.type)
-                return "";
-            switch (p.type) {
+                return '';
+            var match = p.type.match(/^[!\?]?(.*[^=])(=)?$/), type = match[1], optional = !!match[2], result;
+            switch (type.toLowerCase()) {
                 case '*':
-                    return ': any';
-                case 'Array':
-                    return ': Array<any>';
-                case 'Object':
-                    return ': ' + p.type;
+                    result = ': any';
+                    break;
+                case 'array':
+                    result = ': Array<any>';
+                    break;
+                case 'object':
+                    result = ': Object';
+                    break;
+                case 'string':
+                    result = ': string';
+                    break;
                 default:
-                    return (': ' + p.type.toLowerCase()).replace(/^: \?/, '?: ');
+                    result = (': ' + type).replace(/^: \?/, ': ');
             }
+            if (optional) {
+                result = '?' + result;
+            }
+            return result;
         };
         Gen.prototype._templateType = function (p) {
             return Gen.__templateType(p);
@@ -113,8 +123,11 @@ var GeneratorPolymerTS;
             if (tabs === void 0) { tabs = '\t'; }
             var desc = p.desc || '';
             var newline = new RegExp('\\n', 'g');
+            var trailingSpace = new RegExp('[\\n\\s]+$', 'g');
             var comment = new RegExp('\\*/', 'g');
-            return desc.replace(newline, '\n\t' + tabs).replace(comment, '');
+            return desc.replace(trailingSpace, '')
+                .replace(newline, '\n\t' + tabs)
+                .replace(comment, '');
         };
         Gen.prototype._unescapeFile = function (path) {
             var content = this.fs.read(path);
@@ -123,7 +136,7 @@ var GeneratorPolymerTS;
         Gen.prototype._templateReferencePath = function (behavior) {
             behavior = behavior.match(/^(?:Polymer\.)?(.*)/)[1];
             if (!behavior.match('^' + this['moduleName'])) {
-                behavior = '../' + behavior.replace(/^([A-Z][a-z]+).*/, '$1-elements').toLowerCase() + '/' + behavior;
+                behavior = '../' + behavior.replace(/^([A-Z][a-z]+).*/, '$1').toLowerCase() + '/' + behavior;
             }
             return "/// <reference path=\"" + behavior + ".d.ts\"/>";
         };
@@ -154,7 +167,7 @@ var GeneratorPolymerTS;
         Gen.prototype.end = function () {
         };
         return Gen;
-    }());
+    })();
     GeneratorPolymerTS.Gen = Gen;
 })(GeneratorPolymerTS || (GeneratorPolymerTS = {}));
 var gen = yeoman.generators.Base.extend(GeneratorPolymerTS.Gen.prototype);

@@ -1,7 +1,7 @@
 /// <reference path="../typings/yeoman-generator/yeoman-generator.d.ts"/>
 /// <reference path='../typings/underscore.string/underscore.string.d.ts' />
-///  <reference path='../typings/cheerio/cheerio.d.ts' />
-///  <reference path='../typings/mkdirp/mkdirp.d.ts' />
+/// <reference path='../typings/cheerio/cheerio.d.ts' />
+/// <reference path='../typings/mkdirp/mkdirp.d.ts' />
 
 var hyd = require('hydrolysis');
 
@@ -188,20 +188,33 @@ module GeneratorPolymerTS {
 
     }
 
-    private static __templateType( p:hydrolysis.PropertyDescriptor ):string {
-
-      if (!p.type) return "";
-
-      switch (p.type) {
-      case '*':
-        return ': any';
-      case 'Array':
-        return ': Array<any>';
-      case 'Object':
-        return ': ' + p.type;
-      default:
-        return (': ' + p.type.toLowerCase()).replace(/^: \?/, '?: ');
+    private static __templateType(p: hydrolysis.PropertyDescriptor): string {
+      if (!p.type) return '';
+      var match = p.type.match(/^[!\?]?(.*[^=])(=)?$/),
+          type = match[1],
+          optional = !!match[2],
+          result;
+      switch (type.toLowerCase()) {
+        case '*':
+          result = ': any';
+          break;
+        case 'array':
+          result = ': Array<any>';
+          break;
+        case 'object':
+          result = ': Object';
+          break;
+        case 'string':
+          result = ': string';
+          break;
+        default:
+          result = (': ' + type).replace(/^: \?/, ': ');
       }
+
+      if (optional) {
+        result = '?' + result;
+      }
+      return result;
     }
 
     private _templateType( p:hydrolysis.PropertyDescriptor ):string {
@@ -219,21 +232,22 @@ module GeneratorPolymerTS {
 
     private _templateDesc( p:hydrolysis.Descriptor, tabs:string = '\t' ):string{
       var desc = p.desc || '';
-      var newline = new RegExp( '\\n', 'g');
-      var comment = new RegExp( '\\*/', 'g');
-      return desc.replace(newline, '\n\t' + tabs ).replace( comment, '' );
-
+      var newline = new RegExp('\\n', 'g');
+      var trailingSpace = new RegExp('[\\n\\s]+$', 'g');
+      var comment = new RegExp('\\*/', 'g');
+      return desc.replace(trailingSpace, '')
+                .replace(newline, '\n\t' + tabs )
+                .replace(comment, '');
     }
     private _unescapeFile( path:string ) {
       var content = this.fs.read(path);
       this.fs.write( path, _s.unescapeHTML(content.toString()) );
-
     }
     private _templateReferencePath(behavior: string):string {
       behavior = behavior.match(/^(?:Polymer\.)?(.*)/)[1];
 
       if (!behavior.match('^' + this['moduleName'])) {
-        behavior = '../' + behavior.replace(/^([A-Z][a-z]+).*/, '$1-elements').toLowerCase() + '/' + behavior;
+        behavior = '../' + behavior.replace(/^([A-Z][a-z]+).*/, '$1').toLowerCase() + '/' + behavior;
       }
       return `/// <reference path="${behavior}.d.ts"/>`;
     }
