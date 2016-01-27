@@ -239,10 +239,12 @@ module GeneratorPolymerTS {
                 .replace(newline, '\n\t' + tabs )
                 .replace(comment, '');
     }
+
     private _unescapeFile( path:string ) {
       var content = this.fs.read(path);
       this.fs.write( path, _s.unescapeHTML(content.toString()) );
     }
+
     private _templateReferencePath(behavior: string):string {
       behavior = behavior.match(/^(?:Polymer\.)?(.*)/)[1];
 

@@ -1,3 +1,4 @@
+"use strict";
 var hyd = require('hydrolysis');
 var mkdirp = require("mkdirp");
 var path = require("path");
@@ -167,7 +168,7 @@ var GeneratorPolymerTS;
         Gen.prototype.end = function () {
         };
         return Gen;
-    })();
+    }());
     GeneratorPolymerTS.Gen = Gen;
 })(GeneratorPolymerTS || (GeneratorPolymerTS = {}));
 var gen = yeoman.generators.Base.extend(GeneratorPolymerTS.Gen.prototype);
