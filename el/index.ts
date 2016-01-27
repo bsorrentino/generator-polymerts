@@ -83,7 +83,7 @@ module GeneratorPolymerTS {
         this.yo.prompt(prompts, function (answers:any) {
           this.yo.includeImport = answers.includeImport;
           done();
-        }.bind(yo));
+        }.bind(this.yo));
 
     }
 
