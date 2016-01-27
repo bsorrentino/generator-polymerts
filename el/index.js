@@ -34,7 +34,7 @@ var GeneratorPolymerTS;
             this.yo.prompt(prompts, function (answers) {
                 this.yo.includeImport = answers.includeImport;
                 done();
-            }.bind(yo));
+            }.bind(this.yo));
         };
         El.prototype.configuring = function () {
         };
