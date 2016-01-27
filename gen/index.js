@@ -3,31 +3,6 @@ var mkdirp = require("mkdirp");
 var path = require("path");
 var _s = require('underscore.string');
 var yeoman = require("yeoman-generator");
-function __templateType(p) {
-    if (!p.type)
-        return;
-    var match = p.type.match(/^[!\?]?(.*[^=])(=)?$/), type = match[1], optional = !!match[2], result;
-    switch (type.toLowerCase()) {
-        case '*':
-            result = ': any';
-            break;
-        case 'array':
-            result = ': Array<any>';
-            break;
-        case 'object':
-            result = ': Object';
-            break;
-        case 'string':
-            result = ': string';
-            break;
-        default:
-            result = (': ' + type).replace(/^: \?/, ': ');
-    }
-    if (optional) {
-        result = '?' + result;
-    }
-    return result;
-}
 var GeneratorPolymerTS;
 (function (GeneratorPolymerTS) {
     var Gen = (function () {
@@ -109,15 +84,40 @@ var GeneratorPolymerTS;
                 console.log("error: ", e);
             }
         };
+        Gen.__templateType = function (p) {
+            if (!p.type)
+                return '';
+            var match = p.type.match(/^[!\?]?(.*[^=])(=)?$/), type = match[1], optional = !!match[2], result;
+            switch (type.toLowerCase()) {
+                case '*':
+                    result = ': any';
+                    break;
+                case 'array':
+                    result = ': Array<any>';
+                    break;
+                case 'object':
+                    result = ': Object';
+                    break;
+                case 'string':
+                    result = ': string';
+                    break;
+                default:
+                    result = (': ' + type).replace(/^: \?/, ': ');
+            }
+            if (optional) {
+                result = '?' + result;
+            }
+            return result;
+        };
+        Gen.prototype._templateType = function (p) {
+            return Gen.__templateType(p);
+        };
         Gen.prototype._templateParams = function (params) {
             if (!params)
                 return "";
             return params.map(function (value, index, array) {
-                return value.type ? (value.name + __templateType(value)) : value.name;
+                return value.type ? (value.name + Gen.__templateType(value)) : value.name;
             }).join(', ');
-        };
-        Gen.prototype._templateType = function (p) {
-            return __templateType(p);
         };
         Gen.prototype._templateDesc = function (p, tabs) {
             if (tabs === void 0) { tabs = '\t'; }

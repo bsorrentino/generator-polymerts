@@ -1,4 +1,3 @@
-
 /// <reference path="../typings/yeoman-generator/yeoman-generator.d.ts"/>
 /// <reference path='../typings/underscore.string/underscore.string.d.ts' />
 /// <reference path='../typings/cheerio/cheerio.d.ts' />
@@ -13,35 +12,6 @@ import path = require("path");
 import _s = require('underscore.string');
 
 import yeoman = require("yeoman-generator");
-
-function __templateType(p: hydrolysis.PropertyDescriptor): string {
-  if (!p.type) return;
-  var match = p.type.match(/^[!\?]?(.*[^=])(=)?$/),
-      type = match[1],
-      optional = !!match[2],
-      result;
-  switch (type.toLowerCase()) {
-  case '*':
-    result = ': any';
-    break;
-  case 'array':
-    result = ': Array<any>';
-    break;
-  case 'object':
-    result = ': Object';
-    break;
-  case 'string':
-    result = ': string';
-    break;
-  default:
-    result = (': ' + type).replace(/^: \?/, ': ');
-  }
-
-  if (optional) {
-    result = '?' + result;
-  }
-  return result;
-}
 
 module hydrolysis {
   export interface Descriptor {
@@ -217,17 +187,49 @@ module GeneratorPolymerTS {
       }
 
     }
+
+    private static __templateType(p: hydrolysis.PropertyDescriptor): string {
+      if (!p.type) return '';
+      var match = p.type.match(/^[!\?]?(.*[^=])(=)?$/),
+          type = match[1],
+          optional = !!match[2],
+          result;
+      switch (type.toLowerCase()) {
+        case '*':
+          result = ': any';
+          break;
+        case 'array':
+          result = ': Array<any>';
+          break;
+        case 'object':
+          result = ': Object';
+          break;
+        case 'string':
+          result = ': string';
+          break;
+        default:
+          result = (': ' + type).replace(/^: \?/, ': ');
+      }
+
+      if (optional) {
+        result = '?' + result;
+      }
+      return result;
+    }
+
+    private _templateType( p:hydrolysis.PropertyDescriptor ):string {
+      return Gen.__templateType(p);
+    }
+
     private _templateParams( params:Array<Object> ):string {
       if( !params ) return "";
 
       return params.map<string>((value, index, array: Object[]) => {
-        return value.type ? (value.name + __templateType(value)) : value.name;
+        return value.type ? (value.name + Gen.__templateType(value)) : value.name;
       }).join(', ');
 
     }
-    private _templateType( p:hydrolysis.PropertyDescriptor ):string {
-      return __templateType(p);
-    }
+
     private _templateDesc( p:hydrolysis.Descriptor, tabs:string = '\t' ):string{
       var desc = p.desc || '';
       var newline = new RegExp('\\n', 'g');
