@@ -85,7 +85,7 @@ module GeneratorPolymerTS {
   export interface IOptions {
     elpath:string;
     path:string;
-
+    refpath:boolean;
   }
 
   // YEOMAN GENERATOR GENERATOR
@@ -140,7 +140,9 @@ module GeneratorPolymerTS {
                     templateParams:this._templateParams,
                     templateType:this._templateType,
                     templateDesc:this._templateDesc,
-                    templateReferencePath: this._templateReferencePath
+                    templateReferencePath: (this.options.refpath) ?
+                                              this._templateReferencePath :
+                                              this._templateReferenceSimplePath
                 }
             );
             this._unescapeFile(target);
@@ -168,7 +170,7 @@ module GeneratorPolymerTS {
 
       try {
           this.yo.template( path.join(__dirname, 'templates/_behaviour.tst'), target,
-              { element: el,
+              {   element: el,
                   moduleName:module,
                   className:_s.classify(name),
                   props:publicProps,
@@ -176,7 +178,9 @@ module GeneratorPolymerTS {
                   templateParams:this._templateParams,
                   templateType:this._templateType,
                   templateDesc:this._templateDesc,
-                  templateReferencePath:this._templateReferencePath
+                  templateReferencePath: (this.options.refpath) ?
+                                            this._templateReferencePath :
+                                            this._templateReferenceSimplePath
               }
           );
 
@@ -245,12 +249,22 @@ module GeneratorPolymerTS {
       this.fs.write( path, _s.unescapeHTML(content.toString()) );
     }
 
+    private static _referencePathPrefix( elementName:string ) {
+      return elementName.replace(/^([A-Z][a-z]+).*/, '$1').toLowerCase();
+    }
+
     private _templateReferencePath(behavior: string):string {
       behavior = behavior.match(/^(?:Polymer\.)?(.*)/)[1];
 
       if (!behavior.match('^' + this['moduleName'])) {
-        behavior = '../' + behavior.replace(/^([A-Z][a-z]+).*/, '$1').toLowerCase() + '/' + behavior;
+        behavior = path.join( '..', Gen._referencePathPrefix(behavior), behavior ).toString();
       }
+      return `/// <reference path="${behavior}.d.ts"/>`;
+    }
+
+    private _templateReferenceSimplePath(behavior: string):string {
+      behavior = behavior.match(/^(?:Polymer\.)?(.*)/)[1];
+
       return `/// <reference path="${behavior}.d.ts"/>`;
     }
 
@@ -265,6 +279,7 @@ module GeneratorPolymerTS {
 
       this.yo.option("elpath",{desc:"element source path"});
       this.yo.option("path",{desc:"element output path", defaults:"typings/polymer"}) ;
+      this.yo.option("refpath",{desc:"generate reference path", defaults:false}) ;
 
     }
     // YO METHOD

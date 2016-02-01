@@ -13,6 +13,7 @@ var GeneratorPolymerTS;
             this.yo.argument("elementName", { required: true, type: 'string', desc: "element name. Must contains dash symbol!" });
             this.yo.option("elpath", { desc: "element source path" });
             this.yo.option("path", { desc: "element output path", defaults: "typings/polymer" });
+            this.yo.option("refpath", { desc: "generate reference path", defaults: false });
         }
         Gen.prototype._parseElement = function (analyzer) {
             var _this = this;
@@ -48,7 +49,9 @@ var GeneratorPolymerTS;
                         templateParams: this._templateParams,
                         templateType: this._templateType,
                         templateDesc: this._templateDesc,
-                        templateReferencePath: this._templateReferencePath
+                        templateReferencePath: (this.options.refpath) ?
+                            this._templateReferencePath :
+                            this._templateReferenceSimplePath
                     });
                     this._unescapeFile(target);
                 }
@@ -77,7 +80,9 @@ var GeneratorPolymerTS;
                     templateParams: this._templateParams,
                     templateType: this._templateType,
                     templateDesc: this._templateDesc,
-                    templateReferencePath: this._templateReferencePath
+                    templateReferencePath: (this.options.refpath) ?
+                        this._templateReferencePath :
+                        this._templateReferenceSimplePath
                 });
                 this._unescapeFile(target);
             }
@@ -134,11 +139,18 @@ var GeneratorPolymerTS;
             var content = this.fs.read(path);
             this.fs.write(path, _s.unescapeHTML(content.toString()));
         };
+        Gen._referencePathPrefix = function (elementName) {
+            return elementName.replace(/^([A-Z][a-z]+).*/, '$1').toLowerCase();
+        };
         Gen.prototype._templateReferencePath = function (behavior) {
             behavior = behavior.match(/^(?:Polymer\.)?(.*)/)[1];
             if (!behavior.match('^' + this['moduleName'])) {
-                behavior = '../' + behavior.replace(/^([A-Z][a-z]+).*/, '$1').toLowerCase() + '/' + behavior;
+                behavior = path.join('..', Gen._referencePathPrefix(behavior), behavior).toString();
             }
+            return "/// <reference path=\"" + behavior + ".d.ts\"/>";
+        };
+        Gen.prototype._templateReferenceSimplePath = function (behavior) {
+            behavior = behavior.match(/^(?:Polymer\.)?(.*)/)[1];
             return "/// <reference path=\"" + behavior + ".d.ts\"/>";
         };
         Gen.prototype.initializing = function () {
