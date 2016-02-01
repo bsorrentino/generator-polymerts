@@ -42,7 +42,7 @@ Generates a Typescript definition (.d.ts) from an installed Polymer element pres
 
 Example:
 ```
-$ yo polymerts:gen polymer-element [--path <output dir>] [--elpath <source dir>]
+$ yo polymerts:gen polymer-element [--path <output dir>] [--elpath <source dir>] [--refpath true|false]
 ```
 
 **Note:**
@@ -56,4 +56,5 @@ $ yo polymerts:gen polymer-element [--path <output dir>] [--elpath <source dir>]
 ```
 --path, element output path. By default generated element (and dependencies) will put  in folder 'typings/polymer'.
 --elpath, element source path. Just in case (eg. Behaviors ) the element folder hasn't the same name of the element
+--refpath, generate reference path (default: false). The reference path will be generated using a path extracted from name prefix (eg. IronButtonState.d.ts will be referenced as ../iron/IronButtonState.d.ts).
 ```
